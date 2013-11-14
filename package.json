@@ -11,12 +11,14 @@
   "dependencies": {
     "request": "~2.27.0",
     "q": "~0.9.7",
-    "eyespect": "~0.1.10"
+    "eyespect": "~0.1.10",
+    "error-adapter": "0.0.1"
   },
   "devDependencies": {
     "chai": "~1.8.1",
     "mocha": "~1.14.0",
-    "sinon": "~1.7.3"
+    "sinon": "~1.7.3",
+    "uuid": "~1.4.1"
   },
   "directories": {
     "test": "test"

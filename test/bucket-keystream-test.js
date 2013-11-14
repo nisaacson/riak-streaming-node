@@ -1,4 +1,5 @@
-// var inspect = require('eyespect').inspector()
+var uuid = require('uuid')
+var inspect = require('eyespect').inspector()
 var sinon = require('sinon')
 var expect = require('chai').expect
 
@@ -6,7 +7,9 @@ var Client = require('../')
 
 describe('Bucket Keystream', function() {
   var client
-  var bucket = 'installation_ids'
+  var bucket = 'test_suite_bucket'
+  var value = uuid.v4()
+  var key = uuid.v4()
 
 
   before(function(done) {
@@ -16,17 +19,41 @@ describe('Bucket Keystream', function() {
 
     expect(client).to.have.property('bucketStream')
     expect(client.bucketStream).to.be.a('function')
-    done()
+
+    var opts = {
+      bucket: bucket,
+      value: value,
+      key: key
+    }
+    var promise = client.saveWithKey(opts)
+    promise.then(function() {
+      return client.getWithKey(opts)
+    }).then(function(reply) {
+      expect(reply).to.equal(opts.value)
+      done()
+    }).fail(failHandler).done()
+  })
+
+  after(function(done){
+    var opts = {
+      key: key,
+      value: value
+    }
+    var promise = client.deleteWithKey(opts)
+    promise.then(function() {
+      done()
+    }).fail(failHandler).done()
   })
 
   it('should create keystream for bucket correctly', function(done) {
     this.slow(200)
+    // var bucket = 'installation_ids'
     var keyStream = client.bucketKeyStream(bucket)
     expect(keyStream).to.exist
     var dataSpy = sinon.spy(logKey)
     keyStream.on('data', dataSpy)
     keyStream.on('end', function() {
-      expect(dataSpy.callCount).to.be.above(10)
+      expect(dataSpy.callCount).to.be.above(0)
       done()
     })
   })
@@ -43,9 +70,39 @@ describe('Bucket Keystream', function() {
     })
   })
 
+  it('should get key in bucket', function(done) {
+    this.slow('.5s')
+    var opts = {
+      bucket: bucket,
+      key: key
+    }
+    var promise = client.getWithKey(opts)
+    promise.then(function(reply) {
+      expect(reply).to.equal(value)
+      done()
+    }).done()
+  })
 
+  it('should handle missing key in bucket', function(done) {
+    var key = 'testKey'
+    this.slow('.5s')
+    var opts = {
+      bucket: bucket,
+      key: key
+    }
+    var promise = client.getWithKey(opts)
+    promise.then(function(reply) {
+      expect(reply).to.not.exist
+      done()
+    }).done()
+  })
 
 })
+
+function failHandler(err) {
+  inspect(err, 'error')
+  throw err
+}
 
 function logKey(key) {
   expect(key).to.exist
