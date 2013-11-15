@@ -47,10 +47,14 @@ promise.then(function(value) {
   console.dir(value)
 })
 
-// save value for key (returns a promise)
+// save value for key with secondary indices(returns a promise)
 var opts = {
   bucket: 'test_bucket',
   key: 'test_key',
+  indices: {
+    test_index_one: '45'
+    test_index_two: 'foo'
+  },
   value: 'test_value_here'
 }
 var promise = client.saveWithKey(opts)
