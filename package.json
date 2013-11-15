@@ -12,7 +12,8 @@
     "request": "~2.27.0",
     "q": "~0.9.7",
     "eyespect": "~0.1.10",
-    "error-adapter": "0.0.1"
+    "error-adapter": "0.0.1",
+    "JSONStream": "~0.7.1"
   },
   "devDependencies": {
     "chai": "~1.8.1",

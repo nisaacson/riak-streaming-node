@@ -11,7 +11,9 @@ describe('Streaming Riak Client', function() {
   var indexKey = 'test_index'
   var start = '45!2012 01 01 00:00:00'
   var end = '45!2012 01 01 01:01:01'
-  var value = uuid.v4()
+  var value = {
+    id: uuid.v4()
+  }
   var key = uuid.v4()
 
 
@@ -34,7 +36,7 @@ describe('Streaming Riak Client', function() {
     promise.then(function() {
       return client.getWithKey(opts)
     }).then(function(reply) {
-      expect(reply).to.equal(opts.value)
+      expect(reply).to.eql(opts.value)
       done()
     }).fail(function(err) {
       inspect(err, 'before error')
@@ -86,7 +88,7 @@ describe('Streaming Riak Client', function() {
     }
     var promise = client.getWithKey(opts)
     promise.then(function(reply) {
-      expect(reply).to.equal(value)
+      expect(reply).to.eql(value)
       done()
     }).done()
   })
@@ -125,6 +127,26 @@ describe('Streaming Riak Client', function() {
     })
   })
 
+  it('should get value stream by secondary index query', function(done) {
+    this.slow('.5s')
+    var start = '!'
+    var end = 'z'
+    var opts = {
+      bucket: bucket,
+      start: start,
+      indexKey: indexKey,
+      end: end
+    }
+    var stream = client.valueStreamWithQueryRange(opts)
+    expect(stream).to.exist
+    var dataSpy = sinon.spy(logKey)
+    stream.on('data', dataSpy)
+    stream.on('end', function() {
+      expect(dataSpy.callCount).to.be.above(0)
+      done()
+    })
+  })
+
   it('should not get keys when secondary index query does not match', function(done) {
     this.slow('.5s')
     var start = 'z'
@@ -154,5 +176,4 @@ function failHandler(err) {
 
 function logKey(key) {
   expect(key).to.exist
-  expect(key).to.be.a('string')
 }

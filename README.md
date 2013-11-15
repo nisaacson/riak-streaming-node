@@ -2,8 +2,8 @@
 
 Basic riak client that is fully streaming
 
-[![Build Status](https://travis-ci.org/nisaacson/riak-streaming-node.png?branch=master)](https://travis-ci.org/nisaacson/riak-streaming-node)
-[![Dependency Status](https://david-dm.org/nisaacson/riak-streaming-node.png)](https://david-dm.org/nisaacson/riak-streaming-node)
+[![Build Status](https://travis-ci.org/nisaacson/riak-streaming-node.png?branch=master)](https://travis-ci.org/nisaacson/riak-streaming-node) [![Dependency Status](https://david-dm.org/nisaacson/riak-streaming-node.png)](https://david-dm.org/nisaacson/riak-streaming-node)
+
 [![NPM](https://nodei.co/npm/riak-streaming.png)](https://nodei.co/npm/riak-streaming/)
 
 # Installation
@@ -81,9 +81,21 @@ var opts = {
   start: '/x00'
   end: '/xff'
 }
-var queryKeyStream = client.keyStreamWithQueryRange(bucketName)
-queryKeyStream.on('data', function(key) {
+var keyQueryStream = client.keyStreamWithQueryRange(bucketName)
+keyQueryStream.on('data', function(key) {
   console.dir(key)
+})
+
+// value query secondary index (returns a stream that emits values)
+var opts = {
+  bucket: 'test_bucket',
+  indexKey: 'test_index_key',
+  start: '/x00'
+  end: '/xff'
+}
+var valueQueryStream = client.valueStreamWithQueryRange(bucketName)
+valueQueryStream.on('data', function(value) {
+  console.dir(value)
 })
 ```
 
