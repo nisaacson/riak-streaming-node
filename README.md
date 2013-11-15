@@ -9,7 +9,7 @@ Basic riak client that is fully streaming
 # Installation
 
 ```bash
-npm install -S riak-streaming
+npm install -S riaks
 ```
 
 # Usage
