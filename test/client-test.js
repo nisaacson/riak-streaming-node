@@ -9,8 +9,8 @@ describe('Streaming Riak Client', function() {
   var client
   var bucket = 'test_suite_bucket'
   var indexKey = 'test_index'
-  var start = '45'
-  var end = '45'
+  var start = '45!2012 01 01 00:00:00'
+  var end = '45!2012 01 01 01:01:01'
   var value = uuid.v4()
   var key = uuid.v4()
 
@@ -107,6 +107,8 @@ describe('Streaming Riak Client', function() {
 
   it('should get by secondary index query', function(done) {
     this.slow('.5s')
+    var start = '!'
+    var end = 'z'
     var opts = {
       bucket: bucket,
       start: start,
@@ -119,6 +121,26 @@ describe('Streaming Riak Client', function() {
     stream.on('data', dataSpy)
     stream.on('end', function() {
       expect(dataSpy.callCount).to.be.above(0)
+      done()
+    })
+  })
+
+  it('should not get keys when secondary index query does not match', function(done) {
+    this.slow('.5s')
+    var start = 'z'
+    var end = '~'
+    var opts = {
+      bucket: bucket,
+      start: start,
+      indexKey: indexKey,
+      end: end
+    }
+    var stream = client.keyStreamWithQueryRange(opts)
+    expect(stream).to.exist
+    var dataSpy = sinon.spy(logKey)
+    stream.on('data', dataSpy)
+    stream.on('end', function() {
+      expect(dataSpy.callCount).to.equal(0)
       done()
     })
   })
