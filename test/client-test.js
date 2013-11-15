@@ -113,7 +113,7 @@ describe('Streaming Riak Client', function() {
       indexKey: indexKey,
       end: end
     }
-    var stream = client.queryWithRange(opts)
+    var stream = client.keyStreamWithQueryRange(opts)
     expect(stream).to.exist
     var dataSpy = sinon.spy(logKey)
     stream.on('data', dataSpy)

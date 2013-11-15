@@ -81,8 +81,8 @@ var opts = {
   start: '/x00'
   end: '/xff'
 }
-var queryKeyStream = client.queryKeyStream(bucketName)
-keyStream.on('data', function(key) {
+var queryKeyStream = client.keyStreamWithQueryRange(bucketName)
+queryKeyStream.on('data', function(key) {
   console.dir(key)
 })
 ```
