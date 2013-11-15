@@ -9,8 +9,7 @@ Basic riak client that is fully streaming
 # Installation
 
 ```bash
-# not yet published to npm, install from github for now
-# npm install -S riak-streaming-node
+npm install -S riak-streaming
 ```
 
 # Usage
