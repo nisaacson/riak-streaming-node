@@ -5,9 +5,12 @@ var expect = require('chai').expect
 
 var Client = require('../')
 
-describe('Bucket Keystream', function() {
+describe('Streaming Riak Client', function() {
   var client
   var bucket = 'test_suite_bucket'
+  var indexKey = 'test_index'
+  var start = '45'
+  var end = '45'
   var value = uuid.v4()
   var key = uuid.v4()
 
@@ -23,18 +26,23 @@ describe('Bucket Keystream', function() {
     var opts = {
       bucket: bucket,
       value: value,
+      indices: {},
       key: key
     }
+    opts.indices[indexKey] = start
     var promise = client.saveWithKey(opts)
     promise.then(function() {
       return client.getWithKey(opts)
     }).then(function(reply) {
       expect(reply).to.equal(opts.value)
       done()
-    }).fail(failHandler).done()
+    }).fail(function(err) {
+      inspect(err, 'before error')
+      done(err)
+    }).done()
   })
 
-  after(function(done){
+  after(function(done) {
     var opts = {
       key: key,
       value: value
@@ -47,7 +55,7 @@ describe('Bucket Keystream', function() {
 
   it('should create keystream for bucket correctly', function(done) {
     this.slow(200)
-    // var bucket = 'installation_ids'
+// var bucket = 'installation_ids'
     var keyStream = client.bucketKeyStream(bucket)
     expect(keyStream).to.exist
     var dataSpy = sinon.spy(logKey)
@@ -95,6 +103,24 @@ describe('Bucket Keystream', function() {
       expect(reply).to.not.exist
       done()
     }).done()
+  })
+
+  it('should get by secondary index query', function(done) {
+    this.slow('.5s')
+    var opts = {
+      bucket: bucket,
+      start: start,
+      indexKey: indexKey,
+      end: end
+    }
+    var stream = client.queryWithRange(opts)
+    expect(stream).to.exist
+    var dataSpy = sinon.spy(logKey)
+    stream.on('data', dataSpy)
+    stream.on('end', function() {
+      expect(dataSpy.callCount).to.be.above(0)
+      done()
+    })
   })
 
 })

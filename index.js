@@ -3,6 +3,7 @@ var bucketStream = require('./lib/bucket-stream')
 var getWithKey= require('./lib/get-with-key')
 var saveWithKey= require('./lib/save-with-key')
 var deleteWithKey= require('./lib/delete-with-key')
+var queryWithRange = require('./lib/query-with-range')
 
 var defaults = require('./lib/defaults')
 
@@ -23,6 +24,7 @@ Client.prototype.bucketStream = bucketStream
 Client.prototype.getWithKey = getWithKey
 Client.prototype.saveWithKey = saveWithKey
 Client.prototype.deleteWithKey = deleteWithKey
+Client.prototype.queryWithRange = queryWithRange
 
 
 module.exports = Client

@@ -59,7 +59,7 @@ promise.then(function() {
   console.dir('key saved')
 })
 
-// deletefor key (returns a promise)
+// delete with key (returns a promise)
 var opts = {
   bucket: 'test_bucket',
   key: 'test_key'
@@ -68,6 +68,18 @@ var promise = client.deleteWithKey(opts)
 promise.then(function() {
   // if key is not found value will be undefined
   console.dir('key deleted')
+})
+
+// query secondary index (returns a stream that emits keys)
+var opts = {
+  bucket: 'test_bucket',
+  indexKey: 'test_index_key',
+  start: '/x00'
+  end: '/xff'
+}
+var queryKeyStream = client.bucketKeyStream(bucketName)
+keyStream.on('data', function(key) {
+  console.dir(key)
 })
 ```
 
