@@ -65,7 +65,7 @@ describe('Bucket Keystream', function() {
     var dataSpy = sinon.spy(logKey)
     stream.on('data', dataSpy)
     stream.on('end', function() {
-      expect(dataSpy.callCount).to.be.above(1)
+      expect(dataSpy.callCount).to.be.above(0)
       done()
     })
   })

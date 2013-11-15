@@ -1,6 +1,5 @@
 {
-  "name": "riak-node",
-  "private": true,
+  "name": "riak-streaming",
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
@@ -25,10 +24,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/itriage/riak-streaming-node.git"
+    "url": "git://github.com/nisaacson/riak-streaming-node.git"
   },
   "bugs": {
-    "url": "https://github.com/itriage/riak-streaming-node/issues"
+    "url": "https://github.com/nisaacson/riak-streaming-node/issues"
   },
-  "homepage": "https://github.com/itriage/riak-streaming-node"
+  "homepage": "https://github.com/nisaacson/riak-streaming-node"
 }
