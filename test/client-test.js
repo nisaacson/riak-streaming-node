@@ -107,66 +107,6 @@ describe('Streaming Riak Client', function() {
     }).done()
   })
 
-  it('should get by secondary index query', function(done) {
-    this.slow('.5s')
-    var start = '!'
-    var end = 'z'
-    var opts = {
-      bucket: bucket,
-      start: start,
-      indexKey: indexKey,
-      end: end
-    }
-    var stream = client.keyStreamWithQueryRange(opts)
-    expect(stream).to.exist
-    var dataSpy = sinon.spy(logKey)
-    stream.on('data', dataSpy)
-    stream.on('end', function() {
-      expect(dataSpy.callCount).to.be.above(0)
-      done()
-    })
-  })
-
-  it('should get value stream by secondary index query', function(done) {
-    this.slow('.5s')
-    var start = '!'
-    var end = 'z'
-    var opts = {
-      bucket: bucket,
-      start: start,
-      indexKey: indexKey,
-      end: end
-    }
-    var stream = client.valueStreamWithQueryRange(opts)
-    expect(stream).to.exist
-    var dataSpy = sinon.spy(logKey)
-    stream.on('data', dataSpy)
-    stream.on('end', function() {
-      expect(dataSpy.callCount).to.be.above(0)
-      done()
-    })
-  })
-
-  it('should not get keys when secondary index query does not match', function(done) {
-    this.slow('.5s')
-    var start = 'z'
-    var end = '~'
-    var opts = {
-      bucket: bucket,
-      start: start,
-      indexKey: indexKey,
-      end: end
-    }
-    var stream = client.keyStreamWithQueryRange(opts)
-    expect(stream).to.exist
-    var dataSpy = sinon.spy(logKey)
-    stream.on('data', dataSpy)
-    stream.on('end', function() {
-      expect(dataSpy.callCount).to.equal(0)
-      done()
-    })
-  })
-
 })
 
 function failHandler(err) {
