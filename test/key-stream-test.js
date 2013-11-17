@@ -29,20 +29,12 @@ describe('keyStreamWithQueryRange', function() {
       indexKey: indexKey
     }
     var valueStream = client.keyStreamWithQueryRange(queryOpts)
-    var currentKey
-    var dataSpy = sinon.spy(validateKeyStreamData)
+    var dataSpy = sinon.spy(validateKeyStreamData())
     valueStream.on('data', dataSpy)
     valueStream.on('end', function() {
       expect(dataSpy.callCount).to.equal(rowKeys.length)
       done()
     })
-
-    function validateKeyStreamData(key) {
-      if (currentKey && (key < currentKey)) {
-        throw new Error('keys are out of order')
-      }
-      currentKey = key
-    }
   })
 
   it('should get 0 keys if secondary index query does not match', function(done) {
@@ -94,8 +86,6 @@ function failHandler(err) {
 }
 
 function saveRow(row) {
-  var jsonRow = JSON.stringify(row)
-  // var hash = crypto.createHash('sha1').update(jsonRow).digest('hex');
   var key = row.id
   var saveOpts = {
     bucket: bucket,
@@ -117,3 +107,20 @@ function createRow(id) {
   }
   return row
 }
+
+function validateKeyStreamData() {
+  var prevKey
+  return function(key) {
+    if (!prevKey) {
+      prevKey = key
+      return
+    }
+    if (key < prevKey) {
+      inspect(key, 'key')
+      inspect(prevKey, 'prevKey')
+      throw new Error('keys are out of order')
+    }
+    prevKey = key
+  }
+}
+
