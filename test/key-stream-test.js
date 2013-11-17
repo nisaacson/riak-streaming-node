@@ -10,8 +10,8 @@ var _ = require('lodash-node')
 
 var Client = help.require('./')
 var client = new Client({})
-var indexKey = 'value_stream_index'
-var bucket = 'value_stream_test'
+var indexKey = 'key_stream_index'
+var bucket = 'key_stream_test'
 var rowKeys = []
 var numRows = 20
 
@@ -22,6 +22,8 @@ describe('keyStreamWithQueryRange', function() {
   })
 
   it('should get key stream for secondary index query', function(done) {
+    this.slow('.5s')
+
     var queryOpts = {
       bucket: bucket,
       start: '!',
@@ -75,8 +77,8 @@ function setupFixtures(cb) {
   var startID = 20
   var endID = startID + numRows
   var rows = _.range(startID, endID).map(createRow)
-  rows.reverse()
   var promises = rows.map(saveRow)
+  rows.reverse()
   q.all(promises).fail(failHandler).nodeify(cb)
 }
 
