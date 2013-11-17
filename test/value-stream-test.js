@@ -16,10 +16,13 @@ var rowKeys = []
 
 var numRows = 20
 describe('valueStreamWithQueryRange', function() {
+
   before(setupFixtures)
+
   after(function(done) {
     removeRows(rowKeys, done)
   })
+
   it('should get value stream in order', function(done) {
     this.slow('.5s')
     var queryOpts = {
