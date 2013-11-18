@@ -6,27 +6,30 @@ var moment = require('moment')
 
 var time = moment()
 var help = require('./test-helper')
-var inspect = help.inspect
 
-var Client = require('../')
+var Client = help.require('./')
 var client = new Client({})
 var indexKey = 'value_stream_index'
 var bucket = 'value_stream_test'
 var integerIndexBucket = 'value_stream_integer_test'
 var rowKeys = []
 
-var numRows = 30
+var numRows = 200
 
 describe('valueStreamWithQueryRange', function() {
 
-  before(setupFixtures)
+  this.timeout('5s')
+  this.slow('3s')
+
+  before(function(done) {
+    setupFixtures(done)
+  })
 
   after(function(done) {
     removeRows(rowKeys, done)
   })
 
   it('should get value stream in order', function(done) {
-    this.slow('1s')
     var queryOpts = {
       bucket: bucket,
       start: '!',
@@ -44,7 +47,7 @@ describe('valueStreamWithQueryRange', function() {
       var queryOpts = {
         bucket: integerIndexBucket,
         start: 0,
-        end: 100,
+        end: 1000,
         indexKey: indexKey
       }
       var valueStream = client.valueStreamWithQueryRange(queryOpts)
@@ -90,24 +93,25 @@ function deleteKey(key) {
 }
 
 function setupFixtures(cb) {
-  var startID = 20
+  var startID = 200
   var endID = startID + numRows
   var rows = _.range(startID, endID).map(createRow)
-  var promises = rows.map(saveRow)
-  q.all(promises).fail(failHandler).nodeify(cb)
+  var promise = client.bucketDeleteAll(bucket)
+  promise.then(function() {
+    return client.bucketDeleteAll(integerIndexBucket)
+  })
+  .then(function() {
+    var promises = rows.map(saveRow)
+    return q.all(promises)
+  }).fail(help.failHandler).nodeify(cb)
 }
 
 function setupIntegerRows() {
-  var startID = 20
+  var startID = 600
   var endID = startID + numRows
   var rows = _.range(startID, endID).map(createRow)
   var promises = rows.map(saveIntegerRow)
   return q.all(promises)
-}
-
-function failHandler(err) {
-  inspect(err, 'error')
-  throw err
 }
 
 function saveRow(row) {

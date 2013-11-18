@@ -42,6 +42,12 @@ bucketStream.on('data', function(bucketName) {
   console.dir(bucketName)
 })
 
+// delete all keys in a bucket (returns a promise)
+var promise = client.bucketDeleteAll(bucketName)
+promise.then(function() {
+  console.dir('bucket emptied')
+})
+
 // get value for key (returns a promise)
 var opts = {
   bucket: 'test_bucket',
