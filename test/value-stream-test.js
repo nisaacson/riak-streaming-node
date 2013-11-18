@@ -12,6 +12,7 @@ var Client = require('../')
 var client = new Client({})
 var indexKey = 'value_stream_index'
 var bucket = 'value_stream_test'
+var integerIndexBucket = 'value_stream_integer_test'
 var rowKeys = []
 
 var numRows = 20
@@ -32,30 +33,48 @@ describe('valueStreamWithQueryRange', function() {
       indexKey: indexKey
     }
     var valueStream = client.valueStreamWithQueryRange(queryOpts)
-    var prevID
-    var dataSpy = sinon.spy(validateDataEvent)
-    valueStream.on('data', dataSpy)
-    valueStream.on('end', function() {
-      expect(dataSpy.callCount).to.equal(numRows)
-      done()
-    })
-
-    function validateDataEvent(value) {
-      expect(value).to.be.an('object')
-      expect(value).to.have.ownProperty('id')
-      expect(value).to.have.ownProperty('timestamp')
-      var id = value.id
-      if (!prevID) {
-        prevID = id
-        return
-      }
-      expect(id).to.be.above(prevID)
-      prevID = id
-    }
+    validateStream(valueStream, done)
   })
 
-
+  it('should get value stream in order with integer secondary index type', function(done) {
+    this.slow('.5s')
+    setupIntegerRows()
+    .then(function() {
+      var queryOpts = {
+        bucket: integerIndexBucket,
+        start: 0,
+        end: 100,
+        indexKey: indexKey
+      }
+      var valueStream = client.valueStreamWithQueryRange(queryOpts)
+      validateStream(valueStream, done)
+    })
+  })
 })
+
+function validateStream(valueStream, cb) {
+  var prevID
+  var dataSpy = sinon.spy(validateDataEvent)
+  valueStream.on('data', dataSpy)
+  valueStream.on('end', function() {
+    expect(dataSpy.callCount).to.equal(numRows)
+    cb()
+  })
+  valueStream.on('error', cb)
+
+  function validateDataEvent(value) {
+    expect(value).to.be.an('object')
+    expect(value).to.have.ownProperty('id')
+    expect(value).to.have.ownProperty('timestamp')
+    var id = value.id
+    if (!prevID) {
+      prevID = id
+      return
+    }
+    expect(id).to.be.above(prevID)
+    prevID = id
+  }
+}
 
 function removeRows(keys, cb) {
   q.all(keys.map(deleteKey)).nodeify(cb)
@@ -77,6 +96,14 @@ function setupFixtures(cb) {
   q.all(promises).fail(failHandler).nodeify(cb)
 }
 
+function setupIntegerRows() {
+  var startID = 20
+  var endID = startID + numRows
+  var rows = _.range(startID, endID).map(createRow)
+  var promises = rows.map(saveIntegerRow)
+  return q.all(promises)
+}
+
 function failHandler(err) {
   inspect(err, 'error')
   throw err
@@ -90,6 +117,21 @@ function saveRow(row) {
     value: row,
     indices: {}
   }
+  saveOpts.indices[indexKey] = row.id.toString()
+  return client.saveWithKey(saveOpts)
+  .then(function() {
+    rowKeys.push(key)
+  })
+}
+
+function saveIntegerRow(row) {
+  var key = row.id
+  var saveOpts = {
+    bucket: integerIndexBucket,
+    key: key,
+    value: row,
+    indices: {}
+  }
   saveOpts.indices[indexKey] = row.id
   return client.saveWithKey(saveOpts)
   .then(function() {
@@ -99,7 +141,7 @@ function saveRow(row) {
 
 function createRow(id) {
   var row = {
-    id: id.toString(),
+    id: id,
     timestamp: time.add('seconds', id).toString('YYYY-MM-DD HH:mm:ss.sss')
   }
   return row

@@ -86,12 +86,24 @@ keyQueryStream.on('data', function(key) {
   console.dir(key)
 })
 
-// value query secondary index (returns a stream that emits values)
+// value query secondary index with binary index values (returns a stream that emits values)
 var opts = {
   bucket: 'test_bucket',
   indexKey: 'test_index_key',
   start: '/x00'
   end: '/xff'
+}
+var valueQueryStream = client.valueStreamWithQueryRange(bucketName)
+valueQueryStream.on('data', function(value) {
+  console.dir(value)
+})
+
+// value query secondary index with integer index values (returns a stream that emits values)
+var opts = {
+  bucket: 'test_bucket',
+  indexKey: 'test_index_integer_key',
+  start: 0,
+  end: 100
 }
 var valueQueryStream = client.valueStreamWithQueryRange(bucketName)
 valueQueryStream.on('data', function(value) {
