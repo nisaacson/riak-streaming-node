@@ -96,14 +96,19 @@ function setupFixtures(cb) {
   var startID = 200
   var endID = startID + numRows
   var rows = _.range(startID, endID).map(createRow)
+  var promise = cleanBuckets()
+  promise.then(function() {
+    var promises = rows.map(saveRow)
+    return q.all(promises)
+  }).fail(help.failHandler).nodeify(cb)
+}
+
+function cleanBuckets() {
   var promise = client.bucketDeleteAll(bucket)
   promise.then(function() {
     return client.bucketDeleteAll(integerIndexBucket)
   })
-  .then(function() {
-    var promises = rows.map(saveRow)
-    return q.all(promises)
-  }).fail(help.failHandler).nodeify(cb)
+  return promise
 }
 
 function setupIntegerRows() {
