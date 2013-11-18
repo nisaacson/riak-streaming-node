@@ -19,12 +19,6 @@ describe('Streaming Riak Client', function() {
 
   before(function(done) {
     client = new Client({})
-    expect(client).to.have.property('bucketKeyStream')
-    expect(client.bucketKeyStream).to.be.a('function')
-
-    expect(client).to.have.property('bucketStream')
-    expect(client.bucketStream).to.be.a('function')
-
     var opts = {
       bucket: bucket,
       value: value,
@@ -55,10 +49,10 @@ describe('Streaming Riak Client', function() {
     }).fail(failHandler).done()
   })
 
-  it('should create keystream for bucket correctly', function(done) {
+  it('client.bucketKeysStream should stream back keys', function(done) {
     this.slow(200)
 // var bucket = 'installation_ids'
-    var keyStream = client.bucketKeyStream(bucket)
+    var keyStream = client.bucketKeysStream(bucket)
     expect(keyStream).to.exist
     var dataSpy = sinon.spy(logKey)
     keyStream.on('data', dataSpy)

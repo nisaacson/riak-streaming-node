@@ -22,7 +22,7 @@ describe('keyStreamWithQueryRange', function() {
   })
 
   it('should get key stream for secondary index query', function(done) {
-    this.slow('.5s')
+    this.slow('1s')
 
     var queryOpts = {
       bucket: bucket,

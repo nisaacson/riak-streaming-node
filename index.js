@@ -1,4 +1,6 @@
-var bucketKeyStream = require('./lib/bucket-keystream')
+var bucketKeysStream = require('./lib/bucket-keys-stream')
+var bucketKeys = require('./lib/bucket-keys')
+var bucketDeleteAll = require('./lib/bucket-delete-all')
 var bucketStream = require('./lib/bucket-stream')
 var getWithKey= require('./lib/get-with-key')
 var saveWithKey= require('./lib/save-with-key')
@@ -9,6 +11,7 @@ var valueStreamWithQueryRange = require('./lib/value-stream-with-query-range')
 var defaults = require('./lib/defaults')
 
 function Client(opts) {
+  opts = opts || {}
   this.baseURL = getBaseURL(opts)
 }
 
@@ -20,8 +23,10 @@ function getBaseURL(opts) {
   return baseURL
 }
 
-Client.prototype.bucketKeyStream = bucketKeyStream
+Client.prototype.bucketKeys = bucketKeys
+Client.prototype.bucketKeysStream = bucketKeysStream
 Client.prototype.bucketStream = bucketStream
+Client.prototype.bucketDeleteAll = bucketDeleteAll
 Client.prototype.getWithKey = getWithKey
 Client.prototype.saveWithKey = saveWithKey
 Client.prototype.deleteWithKey = deleteWithKey

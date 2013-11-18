@@ -24,9 +24,15 @@ var opts = {
 
 var client = new Client(opts)
 
+// get keys from a bucket (returns a promise)
+var promise = client.bucketKeys(bucketName)
+promise.then(function(keys) {
+  console.dir(keys)
+})
+
 // stream keys from a bucket (returns a stream)
-var keyStream = client.bucketKeyStream(bucketName)
-keyStream.on('data', function(key) {
+var bucketKeysStream = client.bucketKeysStream(bucketName)
+bucketKeysStream.on('data', function(key) {
   console.dir(key)
 })
 
