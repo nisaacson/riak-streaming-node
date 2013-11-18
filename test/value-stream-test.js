@@ -15,7 +15,8 @@ var bucket = 'value_stream_test'
 var integerIndexBucket = 'value_stream_integer_test'
 var rowKeys = []
 
-var numRows = 20
+var numRows = 30
+
 describe('valueStreamWithQueryRange', function() {
 
   before(setupFixtures)
@@ -25,7 +26,7 @@ describe('valueStreamWithQueryRange', function() {
   })
 
   it('should get value stream in order', function(done) {
-    this.slow('.5s')
+    this.slow('1s')
     var queryOpts = {
       bucket: bucket,
       start: '!',
@@ -37,7 +38,7 @@ describe('valueStreamWithQueryRange', function() {
   })
 
   it('should get value stream in order with integer secondary index type', function(done) {
-    this.slow('.5s')
+    this.slow('1s')
     setupIntegerRows()
     .then(function() {
       var queryOpts = {
