@@ -84,6 +84,7 @@
     "after": true,
     "afterEach": true,
     "$": true,
-    "angular": true
+    "angular": true,
+    "Riak" : true
   }
 }

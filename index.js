@@ -8,6 +8,7 @@ var saveWithKey= require('./lib/save-with-key')
 var deleteWithKey= require('./lib/delete-with-key')
 var keyStreamWithQueryRange = require('./lib/key-stream-with-query-range')
 var valueStreamWithQueryRange = require('./lib/value-stream-with-query-range')
+var mapReduceStream = require('./lib/map-reduce-stream')
 
 var defaults = require('./lib/defaults')
 
@@ -34,6 +35,7 @@ Client.prototype.saveWithKey = saveWithKey
 Client.prototype.deleteWithKey = deleteWithKey
 Client.prototype.keyStreamWithQueryRange = keyStreamWithQueryRange
 Client.prototype.valueStreamWithQueryRange = valueStreamWithQueryRange
+Client.prototype.mapReduceStream = mapReduceStream
 
 
 module.exports = Client
