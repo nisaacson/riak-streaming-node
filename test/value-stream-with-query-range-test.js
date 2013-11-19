@@ -41,7 +41,6 @@ describe('valueStreamWithQueryRange', function() {
   })
 
   it('should get value stream in order with integer secondary index type', function(done) {
-    this.slow('1s')
     setupIntegerRows()
     .then(function() {
       var queryOpts = {

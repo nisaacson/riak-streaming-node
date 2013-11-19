@@ -8,7 +8,7 @@ var bucket = 'test_delete_all_bucket2'
 
 var numRows = 2
 var keys = []
-describe('Bucket Delete All', function() {
+describe('bucketDeleteAll', function() {
   before(saveTestKeys)
 
   after(function(done) {

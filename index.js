@@ -1,5 +1,6 @@
-var bucketKeysStream = require('./lib/bucket-keys-stream')
+var purgeDB = require('./lib/purge-db')
 var bucketKeys = require('./lib/bucket-keys')
+var bucketKeysStream = require('./lib/bucket-keys-stream')
 var bucketDeleteAll = require('./lib/bucket-delete-all')
 var bucketStream = require('./lib/bucket-stream')
 var getWithKey= require('./lib/get-with-key')
@@ -23,6 +24,7 @@ function getBaseURL(opts) {
   return baseURL
 }
 
+Client.prototype.purgeDB = purgeDB
 Client.prototype.bucketKeys = bucketKeys
 Client.prototype.bucketKeysStream = bucketKeysStream
 Client.prototype.bucketStream = bucketStream
