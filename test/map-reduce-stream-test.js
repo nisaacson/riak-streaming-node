@@ -13,7 +13,7 @@ var baseIndexKey = 'index'
 var numRows = 20
 
 var rowKeys = []
-describe('Build Mapreduce json', function() {
+describe('mapReduceStream', function() {
   before(setupFixtures)
   after(deleteRows)
 

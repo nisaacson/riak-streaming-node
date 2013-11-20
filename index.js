@@ -14,7 +14,14 @@ var defaults = require('./lib/defaults')
 
 function Client(opts) {
   opts = opts || {}
+  this.hostname = getValue(opts, 'host')
+  this.port = getValue(opts, 'port')
+  this.protocol = getValue(opts, 'protocol')
   this.baseURL = getBaseURL(opts)
+}
+
+function getValue(opts, key) {
+  return opts[key] || defaults[key]
 }
 
 function getBaseURL(opts) {

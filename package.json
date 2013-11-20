@@ -14,7 +14,9 @@
     "eyespect": "~0.1.10",
     "error-adapter": "0.0.1",
     "JSONStream": "~0.7.1",
-    "lodash-node": "~2.3.0"
+    "lodash-node": "~2.3.0",
+    "formidable": "~1.0.14",
+    "resumer": "0.0.0"
   },
   "devDependencies": {
     "chai": "~1.8.1",
