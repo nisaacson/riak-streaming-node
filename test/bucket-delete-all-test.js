@@ -12,6 +12,7 @@ describe('bucketDeleteAll', function() {
   before(saveTestKeys)
 
   after(function(done) {
+    this.timeout('8s')
     var promises = keys.map(deleteKey)
     q.all(promises).nodeify(done)
   })
