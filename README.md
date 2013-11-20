@@ -238,6 +238,7 @@ function getMapReduceOpts() {
   }
   opts.mapReduceOpts = mapReduceOpts,
   opts.inputs = inputs
+  opts.timeout = 1000 // optional, set to 1000 milliseconds timeout or 1 second
   return opts
 }
 
