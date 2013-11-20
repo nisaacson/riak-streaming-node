@@ -10,6 +10,8 @@ var value = {
 
 describe('deleteWithKey', function() {
 
+  this.slow('1s')
+
   it('should delete existing key', function(done) {
     var key = 'existing_key'
     var promise = saveKey(key)

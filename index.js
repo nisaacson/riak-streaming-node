@@ -1,15 +1,3 @@
-var purgeDB = require('./lib/purge-db')
-var bucketKeys = require('./lib/bucket-keys')
-var bucketKeysStream = require('./lib/bucket-keys-stream')
-var bucketDeleteAll = require('./lib/bucket-delete-all')
-var bucketStream = require('./lib/bucket-stream')
-var getWithKey= require('./lib/get-with-key')
-var saveWithKey= require('./lib/save-with-key')
-var deleteWithKey= require('./lib/delete-with-key')
-var keyStreamWithQueryRange = require('./lib/key-stream-with-query-range')
-var valueStreamWithQueryRange = require('./lib/value-stream-with-query-range')
-var mapReduceStream = require('./lib/map-reduce-stream')
-
 var defaults = require('./lib/defaults')
 
 function Client(opts) {
@@ -32,17 +20,17 @@ function getBaseURL(opts) {
   return baseURL
 }
 
-Client.prototype.purgeDB = purgeDB
-Client.prototype.bucketKeys = bucketKeys
-Client.prototype.bucketKeysStream = bucketKeysStream
-Client.prototype.bucketStream = bucketStream
-Client.prototype.bucketDeleteAll = bucketDeleteAll
-Client.prototype.getWithKey = getWithKey
-Client.prototype.saveWithKey = saveWithKey
-Client.prototype.deleteWithKey = deleteWithKey
-Client.prototype.keyStreamWithQueryRange = keyStreamWithQueryRange
-Client.prototype.valueStreamWithQueryRange = valueStreamWithQueryRange
-Client.prototype.mapReduceStream = mapReduceStream
+Client.prototype.purgeDB = require('./lib/purge-db')
+Client.prototype.bucketKeys = require('./lib/bucket-keys')
+Client.prototype.bucketKeysStream = require('./lib/bucket-keys-stream')
+Client.prototype.bucketStream = require('./lib/bucket-stream')
+Client.prototype.bucketDeleteAll = require('./lib/bucket-delete-all')
+Client.prototype.getWithKey = require('./lib/get-with-key')
+Client.prototype.saveWithKey = require('./lib/save-with-key')
+Client.prototype.deleteWithKey = require('./lib/delete-with-key')
+Client.prototype.keyStreamWithQueryRange = require('./lib/key-stream-with-query-range')
+Client.prototype.valueStreamWithQueryRange = require('./lib/value-stream-with-query-range')
+Client.prototype.mapReduceStream = require('./lib/map-reduce-stream')
 
 
 module.exports = Client
