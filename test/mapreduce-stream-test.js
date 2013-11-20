@@ -40,8 +40,8 @@ describe('Build Mapreduce json', function() {
       expect(dataSpy.callCount).to.equal(numRows)
       done()
     })
-
   })
+
 })
 
 function getMapReduceOpts() {

@@ -1,16 +1,15 @@
 var uuid = require('uuid')
-var inspect = require('eyespect').inspector()
+var help = require('./test-helper')
 var sinon = require('sinon')
 var expect = require('chai').expect
 
-var Client = require('../')
+var Client = help.require('./')
 
 describe('Streaming Riak Client', function() {
   var client
   var bucket = 'test_suite_bucket'
   var indexKey = 'test_index'
   var start = '45!2012 01 01 00:00:00'
-  var end = '45!2012 01 01 01:01:01'
   var value = {
     id: uuid.v4()
   }
@@ -33,7 +32,7 @@ describe('Streaming Riak Client', function() {
       expect(reply).to.eql(opts.value)
       done()
     }).fail(function(err) {
-      inspect(err, 'before error')
+      help.inspect(err, 'before error')
       done(err)
     }).done()
   })
