@@ -17,6 +17,7 @@ describe('Streaming Riak Client', function() {
 
 
   before(function(done) {
+    this.timeout('10s')
     client = new Client({})
     var opts = {
       bucket: bucket,
