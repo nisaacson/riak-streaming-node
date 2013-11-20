@@ -1,10 +1,29 @@
-# Riak Streaming
+# Overview
 
 Basic riak client that is fully streaming
 
 [![Build Status](https://travis-ci.org/nisaacson/riak-streaming-node.png?branch=master)](https://travis-ci.org/nisaacson/riak-streaming-node) [![Dependency Status](https://david-dm.org/nisaacson/riak-streaming-node.png)](https://david-dm.org/nisaacson/riak-streaming-node) [![Code Climate](https://codeclimate.com/github/nisaacson/riak-streaming-node.png)](https://codeclimate.com/github/nisaacson/riak-streaming-node)
 
 [![NPM](https://nodei.co/npm/riaks.png)](https://nodei.co/npm/riaks/)
+
+**Table of Contents**
+
+- [Overview](#overview)
+- [Installation](#installation)
+- [Usage](#usage)
+- [API](#api)
+    - [bucketKeys](#bucketkeys)
+    - [bucketKeysStream](#bucketkeysstream)
+    - [bucketStream](#bucketstream)
+    - [bucketDeleteAll](#bucketdeleteall)
+    - [getWithKey](#getwithkey)
+    - [saveWithKey](#savewithkey)
+    - [deleteWithKey](#deletewithkey)
+    - [keyStreamWithQueryRange](#keystreamwithqueryrange)
+    - [valueStreamWithQueryRange](#valuestreamwithqueryrange)
+    - [mapReduceStream](#mapreducestream)
+    - [purgeDB](#purgedb)
+- [Test](#test)
 
 # Installation
 
@@ -24,6 +43,9 @@ var opts = {
 
 var client = new Client(opts)
 ```
+
+
+# API
 
 Once you have a client object, the following api is available
 
