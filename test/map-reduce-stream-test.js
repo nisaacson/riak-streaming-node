@@ -79,7 +79,7 @@ function getMapReduceOpts() {
 }
 
 function mapFunction(value, keyData, arg) {
-  var data = Riak.mapValuesJson(value)[0]
+  var data = value.values[0].data
   var metadata = value.values[0].metadata
   var index = metadata.index[arg]
   var output = {
