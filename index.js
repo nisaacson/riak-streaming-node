@@ -31,6 +31,7 @@ Client.prototype.deleteWithKey = require('./lib/delete-with-key')
 Client.prototype.keyStreamWithQueryRange = require('./lib/key-stream-with-query-range')
 Client.prototype.valueStreamWithQueryRange = require('./lib/value-stream-with-query-range')
 Client.prototype.mapReduceStream = require('./lib/map-reduce-stream')
+Client.prototype.queryRangeStream = require('./lib/query-range-stream')
 
 
 module.exports = Client

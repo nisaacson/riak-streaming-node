@@ -21,6 +21,7 @@ Basic riak client that is fully streaming
     - [deleteWithKey](#deletewithkey)
     - [keyStreamWithQueryRange](#keystreamwithqueryrange)
     - [valueStreamWithQueryRange](#valuestreamwithqueryrange)
+    - [queryRangeStream](#queryRangeStream)
     - [mapReduceStream](#mapreducestream)
     - [purgeDB](#purgedb)
 - [Test](#test)
@@ -191,6 +192,24 @@ var opts = {
 var valueQueryStream = client.valueStreamWithQueryRange(bucketName)
 valueQueryStream.on('data', function(value) {
   console.dir(value)
+})
+```
+
+## queryRangeStream
+
+Stream back keys from a secondary index query. The appriate suffix of either `_int` or `_bin` will appended to the index key based on the type of value in the `start` field. This maps the to [http://docs.basho.com/riak/latest/dev/references/http/secondary-indexes/](http://docs.basho.com/riak/latest/dev/references/http/secondary-indexes/) http interface in Riak.
+
+
+```javascript
+var opts = {
+  bucket: 'test_bucket',
+  indexKey: 'test_index_key',
+  start: '/x00'
+  end: '/xff'
+}
+var keyStream = client.queryRangeStream(opts)
+keyStream.on('data', function(key) {
+  console.dir(key)
 })
 ```
 
