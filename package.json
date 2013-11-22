@@ -1,6 +1,6 @@
 {
   "name": "riaks",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "Riak client with a streaming interface",
   "main": "index.js",
   "scripts": {
