@@ -199,13 +199,18 @@ valueQueryStream.on('data', function(value) {
 
 Stream back keys from a secondary index query. The appriate suffix of either `_int` or `_bin` will appended to the index key based on the type of value in the `start` field. This maps the to [http://docs.basho.com/riak/latest/dev/references/http/secondary-indexes/](http://docs.basho.com/riak/latest/dev/references/http/secondary-indexes/) http interface in Riak.
 
+If you want the secondary index values in the output, specify `returnTerms: true` in the options object. Note that the `returnTerms` corresponds to `return_values` in the riak http options.
+
+If you want limit the number of results returned, specify `maxResults: <integer value`. The `maxResults` options maps the riak `max_results` url parameter.
 
 ```javascript
 var opts = {
   bucket: 'test_bucket',
-  indexKey: 'test_index_key',
-  start: '/x00'
-  end: '/xff'
+  indexKey: 'test_index_key', // `_bin` or `_int` suffix automatically added based on start value type
+  start: '/x00',
+  end: '/xff',
+  returnTerms: false, // false by default if not specified
+  maxResults: 10 // optional, limits the number of results returned
 }
 var keyStream = client.queryRangeStream(opts)
 keyStream.on('data', function(key) {
@@ -302,3 +307,12 @@ npm install
 make test # or npm test
 ```
 
+To make testing easier, a `Vagrantfile` is included in the root of this repo. Bringing up this virtual machine will install the required dependencies so that you can test the riaks client without having to install nodejs and riak on your local machine.
+
+```bash
+vagrant up --provision
+vagrant ssh
+cd /vagrant
+npm install
+npm test
+```
