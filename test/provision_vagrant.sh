@@ -41,14 +41,6 @@ function install_node {
   exit 1
 }
 
-function install_erlang {
-  sudo apt-get install -y -qq python-software-properties python g++ make
-  sudo add-apt-repository -y ppa:scattino/ppa
-  sudo apt-get update -y
-  sudo apt-get install -qqy erlang
-
-}
-
 function install_riak {
   echo "-----> Install riak if needed"
   command -v riak > /dev/null
@@ -56,7 +48,6 @@ function install_riak {
     echo "       riak already installed"
     return
   fi
-  install_erlang
   echo "       riak not installed, begin installation from ppa now"
   curl http://apt.basho.com/gpg/basho.apt.key | sudo apt-key add -
   sudo bash -c "echo deb http://apt.basho.com $(lsb_release -sc) main > /etc/apt/sources.list.d/basho.list"

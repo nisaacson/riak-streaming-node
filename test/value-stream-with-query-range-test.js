@@ -18,8 +18,8 @@ var numRows = 200
 
 describe('valueStreamWithQueryRange', function() {
 
-  this.timeout('5s')
-  this.slow('3s')
+  this.timeout('10s')
+  this.slow('5s')
 
   before(function(done) {
     setupFixtures(done)
