@@ -21,7 +21,7 @@ Basic riak client that is fully streaming
     - [deleteWithKey](#deletewithkey)
     - [keyStreamWithQueryRange](#keystreamwithqueryrange)
     - [valueStreamWithQueryRange](#valuestreamwithqueryrange)
-    - [queryRangeStream](#queryRangeStream)
+    - [queryRangeStream](#queryrangestream)
     - [mapReduceStream](#mapreducestream)
     - [purgeDB](#purgedb)
 - [Test](#test)
@@ -199,9 +199,11 @@ valueQueryStream.on('data', function(value) {
 
 Stream back keys from a secondary index query. The appriate suffix of either `_int` or `_bin` will appended to the index key based on the type of value in the `start` field. This maps the to [http://docs.basho.com/riak/latest/dev/references/http/secondary-indexes/](http://docs.basho.com/riak/latest/dev/references/http/secondary-indexes/) http interface in Riak.
 
-If you want the secondary index values in the output, specify `returnTerms: true` in the options object. Note that the `returnTerms` corresponds to `return_values` in the riak http options.
+If you want the secondary index values in the output, specify `returnTerms: true` in the options object. Note that the `returnTerms` corresponds to `return_terms` in the riak http options.
 
 If you want limit the number of results returned, specify `maxResults: <integer value`. The `maxResults` options maps the riak `max_results` url parameter.
+
+* Keys only
 
 ```javascript
 var opts = {
@@ -215,6 +217,28 @@ var opts = {
 var keyStream = client.queryRangeStream(opts)
 keyStream.on('data', function(key) {
   console.dir(key)
+})
+```
+
+* Keys And Index values
+
+```javascript
+var inspect = require('eyespect').inspector()
+var opts = {
+  bucket: 'test_bucket',
+  indexKey: 'test_index_key', // `_bin` or `_int` suffix automatically added based on start value type
+  start: '/x00',
+  end: '/xff',
+  returnTerms: true, // false by default if not specified
+  maxResults: 10 // optional, limits the number of results returned
+}
+var keyStream = client.queryRangeStream(opts)
+keyStream.on('data', function(data) {
+  var dataKeys = Object.keys(data)
+  var key = dataKeys[0]
+  var value = dataKeys[key]
+  inspect(key, 'got key')
+  inspect(value, 'matched secondary index value')
 })
 ```
 
