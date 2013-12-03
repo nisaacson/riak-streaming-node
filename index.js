@@ -1,11 +1,18 @@
+var riakpbc = require('riakpbc')
 var defaults = require('./lib/defaults')
 
 function Client(opts) {
   opts = opts || {}
-  this.hostname = getValue(opts, 'host')
+  this.host = getValue(opts, 'host')
   this.port = getValue(opts, 'port')
   this.protocol = getValue(opts, 'protocol')
   this.baseURL = getBaseURL(opts)
+  var createOpts = {
+    host: this.host,
+    port: this.port
+  }
+  var client = riakpbc.createClient(createOpts)
+  this.client = client
 }
 
 function getValue(opts, key) {

@@ -1,3 +1,4 @@
+var inspect = require('eyespect').inspector()
 var uuid = require('uuid')
 var help = require('./test-helper')
 var sinon = require('sinon')
