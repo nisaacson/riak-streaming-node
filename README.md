@@ -122,6 +122,7 @@ var opts = {
     test_index_one: '45'
     test_index_two: 'foo'
   },
+  returnBody: true, // (optional) whether to return the contents of the stored object. defaults to false
   value: 'test_value_here'
 }
 var promise = client.saveWithKey(opts)

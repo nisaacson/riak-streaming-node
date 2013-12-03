@@ -23,11 +23,13 @@ describe('Streaming Riak Client', function() {
       bucket: bucket,
       value: value,
       indices: {},
-      key: key
+      key: key,
+      returnBody: true
     }
     opts.indices[indexKey] = start
     var promise = client.saveWithKey(opts)
-    promise.then(function() {
+    promise.then(function(reply) {
+      expect(reply).to.eql(value)
       return client.getWithKey(opts)
     }).then(function(reply) {
       expect(reply).to.eql(opts.value)

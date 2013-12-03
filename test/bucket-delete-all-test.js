@@ -70,7 +70,8 @@ function saveKey(id) {
   var saveOpts = {
     key: key,
     value: id,
-    bucket: bucket
+    bucket: bucket,
+    returnValue: true
   }
   return client.saveWithKey(saveOpts)
 }

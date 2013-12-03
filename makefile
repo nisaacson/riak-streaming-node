@@ -1,5 +1,5 @@
 MOCHA?=node_modules/.bin/mocha
-REPORTER?=spec
+REPORTER?=list
 GROWL?=--growl
 FLAGS=$(GROWL) --reporter $(REPORTER) --colors
 
