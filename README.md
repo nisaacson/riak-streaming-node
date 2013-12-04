@@ -55,7 +55,9 @@ Once you have a client object, the following api is available
 Get all keys from a bucket (returns a promise). According to Riak this should not be used in production since it is very slow
 
 ```javascript
-var promise = client.bucketKeys(bucketName)
+var opts = {
+  bucket: 'test_bucket_name' // name of the bucket to look in
+var promise = client.bucketKeys(opts)
 promise.then(function(keys) {
   console.dir(keys)
 })
@@ -66,8 +68,11 @@ promise.then(function(keys) {
 Get all the keys in a bucket, but stream them back as they come back from Riak
 
 ```javascript
-var bucketKeysStream = client.bucketKeysStream(bucketName)
-bucketKeysStream.on('data', function(key) {
+var opts = {
+  bucket: 'test_bucket_name' // name of the bucket to look in
+}
+var keyStream = client.bucketKeysStream(opts)
+keyStream.on('data', function(key) {
   console.dir(key)
 })
 ```
@@ -89,7 +94,11 @@ bucketStream.on('data', function(bucketName) {
 delete all keys in a bucket (returns a promise)
 
 ```javascript
-var promise = client.bucketDeleteAll(bucketName)
+var opts = {
+  bucket: 'test_bucket', // name of bucket
+  concurrency: 5 // optional, limits max number of simultanous delete requests to riak
+}
+var promise = client.bucketDeleteAll(opts)
 promise.then(function() {
   console.dir('bucket emptied')
 })
@@ -97,7 +106,9 @@ promise.then(function() {
 
 ## getWithKey
 
-get value for key (returns a promise)
+Get value for key (returns a promise).
+
+If the object was saved with `content-type: application/json`, the client will call JSON.parse and return an actual javascript object.
 
 ```javascript
 var opts = {
@@ -109,6 +120,43 @@ promise.then(function(value) {
   // if key is not found value will be undefined
   console.dir(value)
 })
+```
+
+If you need both the value as well as the secondary index key value pairs, specify the `returnIndices: true` parameter.
+
+```javascript
+var opts = {
+  bucket: 'test_bucket',
+  key: 'test_key',
+  returnIndices: true // optional, return 2i indexes
+}
+var promise = client.getWithKey(opts)
+promise.then(function(reply) {
+  // note that reply is null if no key-value pair exists in riak
+  var value = reply.value
+  console.dir(value)
+
+  var indices = reply.indices
+  console.dir(indices)
+})
+```
+
+In the example above, the reply from getWithKey will look like
+
+```javascript
+{
+  value: { foo: 'bar'}, // actual javascript object but stored as json in riak
+  indices: [
+    {
+      key: 'first_index_bin',
+      value: 'first index value here'
+    },
+    {
+      key: 'second_index_bin',
+      value: 'second index value here'
+    }
+  ]
+}
 ```
 
 ## saveWithKey
