@@ -9,22 +9,22 @@
   "author": "nisaacson",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "request": "~2.27.0",
+    "request": "~2.28.0",
     "q": "~0.9.7",
     "eyespect": "~0.1.10",
     "error-adapter": "0.0.1",
     "JSONStream": "~0.7.1",
-    "lodash-node": "~2.3.0",
+    "lodash-node": "~2.4.1",
     "formidable": "~1.0.14",
     "resumer": "0.0.0",
-    "riakpbc": "~0.1.0",
     "through": "~2.3.4",
     "errs": "~0.2.4",
-    "async": "~0.2.9"
+    "async": "~0.2.9",
+    "riakpbc": "~1.0.4"
   },
   "devDependencies": {
     "chai": "~1.8.1",
-    "mocha": "~1.14.0",
+    "mocha": "~1.15.1",
     "sinon": "~1.7.3",
     "moment": "~2.4.0"
   },
