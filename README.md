@@ -33,16 +33,49 @@ npm install -S riaks
 
 # Usage
 
+The client supports both the riak `http` interface as well as `protocol buffers`. Specify the interface you wish to use via the `protocol` parameter in the configuration option.  The api of the resulting client object is the same regardless of which protocol is used.
+
+
+* http Client
+
 ```javascript
-var Client = require('riak-streaming')
+var Client = require('riaks')
 var opts = {
   host: 'localhost',
   protocol: 'http',
-  port: '8098'
+  port: 8098
 }
 
 var client = new Client(opts)
 ```
+
+
+* protocol buffer client. Use the `protocol: 'protobuf` setting.
+
+```javascript
+var Client = require('riaks')
+var opts = {
+  host: 'localhost',
+  protocol: 'protobuf',
+  port: 8087
+}
+
+var client = new Client(opts)
+```
+
+* https Client. If you want all traffic to be encrypted over https, use the `protocol: 'https'` setting
+
+```javascript
+var Client = require('riaks')
+var opts = {
+  host: 'localhost',
+  protocol: 'https',
+  port: 443
+}
+
+var client = new Client(opts)
+```
+
 
 
 # API
@@ -56,6 +89,7 @@ Get all keys from a bucket (returns a promise). According to Riak this should no
 ```javascript
 var opts = {
   bucket: 'test_bucket_name' // name of the bucket to look in
+}
 var promise = client.bucketKeys(opts)
 promise.then(function(keys) {
   console.dir(keys)
@@ -161,6 +195,8 @@ In the example above, the reply from getWithKey will look like
 ## saveWithKey
 save value for key with optionaly secondary indices(returns a promise). In the following example, we set two different secondary indices `test_index_one` with value `45` and `test_index_two` with value `foo`
 
+* String value
+
 ```javascript
 var opts = {
   bucket: 'test_bucket',
@@ -171,6 +207,26 @@ var opts = {
   },
   returnBody: true, // (optional) whether to return the contents of the stored object. defaults to false
   value: 'test_value_here'
+}
+var promise = client.saveWithKey(opts)
+promise.then(function() {
+  // if key is not found value will be undefined
+  console.dir('key saved')
+})
+```
+
+* Object value. `JSON.stringify` will be called on the value before it is saved to riak and the header `content-type: application/json` header will be applied. When you get this value back from riak via the `client.getWithKey` method, `JSON.parse` will be called so you receive an actual object back.
+
+```javascript
+var opts = {
+  bucket: 'test_bucket',
+  key: 'test_key',
+  indices: {
+    test_index_one: '45'
+    test_index_two: 'foo'
+  },
+  returnBody: true, // (optional) whether to return the contents of the stored object. defaults to false
+  value: { foo: 'bar' }
 }
 var promise = client.saveWithKey(opts)
 promise.then(function() {
@@ -244,7 +300,7 @@ keyStream.on('data', function(data) {
 
 ## mapReduceStream
 
-Run mapreduce jobs with arbitrary javascript functions and stream back the results
+Run mapreduce jobs with arbitrary javascript functions and stream back the results. In the example below, the actual javascript functions for the map and reduce phase as passed in as paramters. The client will handle stringifying these functions before sending the `mapred` request to riak.
 
 ```javascript
 var opts = getMapReduceOpts()
@@ -278,6 +334,8 @@ function getMapReduceOpts() {
   }
   var opts = {}
   var query = [mapPhaseOpts, reducePhaseOpts]
+
+  // use a secondary index query as an input to the map reduce job
   var inputs = {
     bucket: 'test_bucket',
     index: 'test_index_key_bin',
