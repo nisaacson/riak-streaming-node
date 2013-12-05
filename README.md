@@ -50,7 +50,7 @@ var client = new Client(opts)
 ```
 
 
-* protocol buffer client. Use the `protocol: 'protobuf` setting.
+* protocol buffer client. Use the `protocol: 'protobuf'` setting.
 
 ```javascript
 var Client = require('riaks')
