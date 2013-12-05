@@ -19,7 +19,6 @@ Basic riak client that is fully streaming
     - [getWithKey](#getwithkey)
     - [saveWithKey](#savewithkey)
     - [deleteWithKey](#deletewithkey)
-    - [keyStreamWithQueryRange](#keystreamwithqueryrange)
     - [valueStreamWithQueryRange](#valuestreamwithqueryrange)
     - [queryRangeStream](#queryrangestream)
     - [mapReduceStream](#mapreducestream)
@@ -122,13 +121,13 @@ promise.then(function(value) {
 })
 ```
 
-If you need both the value as well as the secondary index key value pairs, specify the `returnIndices: true` parameter.
+If you need both the value as well as the secondary index key value pairs, specify the `returnMeta: true` parameter.
 
 ```javascript
 var opts = {
   bucket: 'test_bucket',
   key: 'test_key',
-  returnIndices: true // optional, return 2i indexes
+  returnMeta: true // optional, return 2i indexes, headers, etc
 }
 var promise = client.getWithKey(opts)
 promise.then(function(reply) {
@@ -193,54 +192,6 @@ var promise = client.deleteWithKey(opts)
 promise.then(function() {
   // if key is not found value will be undefined
   console.dir('key deleted')
-})
-```
-
-## keyStreamWithQueryRange
-
-Get all keys that match a given secondary index query, where the keys are streamed one at a time as they come back from Riak. The appriate secondary index key suffix of `_bin` or `_int` will be appended as appropriate based on the type of value passed in the `start` field.
-
-```javascript
-var opts = {
-  bucket: 'test_bucket',
-  indexKey: 'test_index_key',
-  start: '/x00'
-  end: '/xff'
-}
-var keyQueryStream = client.keyStreamWithQueryRange(bucketName)
-keyQueryStream.on('data', function(key) {
-  console.dir(key)
-})
-```
-
-## valueStreamWithQueryRange
-Get all values that match a given secondary index query, where the values are streamed one at a time as they come back from Riak. The values are returned in sorted order based on the index key used. The appriate secondary index key suffix of `_bin` or `_int` will be appended as appropriate based on the type of value passed in the `start` field.
-
-Using a binary index. Note the `start: '\x00'` value where `typeof '\xoo' !== 'number'`.
-```javascript
-var opts = {
-  bucket: 'test_bucket',
-  indexKey: 'test_index_binary_key',
-  start: '/x00'
-  end: '/xff'
-}
-var valueQueryStream = client.valueStreamWithQueryRange(bucketName)
-valueQueryStream.on('data', function(value) {
-  console.dir(value)
-})
-```
-
-Using a integer index. Note the `start: 0` value where `typeof 0 === 'number'`.
-```javascript
-var opts = {
-  bucket: 'test_bucket',
-  indexKey: 'test_index_integer_key',
-  start: 0,
-  end: 100
-}
-var valueQueryStream = client.valueStreamWithQueryRange(bucketName)
-valueQueryStream.on('data', function(value) {
-  console.dir(value)
 })
 ```
 
@@ -325,15 +276,15 @@ function getMapReduceOpts() {
       arg: 'foo'
     }
   }
-  var mapReduceOpts = [mapPhaseOpts, reducePhaseOpts]
   var opts = {}
+  var query = [mapPhaseOpts, reducePhaseOpts]
   var inputs = {
     bucket: 'test_bucket',
     index: 'test_index_key_bin',
     start: 'test_start',
     end: 'test_end'
   }
-  opts.mapReduceOpts = mapReduceOpts,
+  opts.query = query
   opts.inputs = inputs
   opts.timeout = 1000 // optional, set to 1000 milliseconds timeout or 1 second
   return opts
