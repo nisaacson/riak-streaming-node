@@ -1,7 +1,7 @@
 var parseChunkedStream = require('./parse-chunked-stream')
 var request = require('request')
 var JSONStream = require('JSONStream')
-var getIndexKey = require('./get-index-key')
+var getIndexKey = require('../lib/get-index-key')
 
 module.exports = function(opts) {
   opts.baseURL = this.baseURL

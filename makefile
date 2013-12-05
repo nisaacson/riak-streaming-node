@@ -1,5 +1,5 @@
 MOCHA?=node_modules/.bin/mocha
-REPORTER?=list
+REPORTER?=spec
 GROWL?=--growl
 FLAGS=$(GROWL) --reporter $(REPORTER) --colors
 
@@ -12,13 +12,13 @@ one:
 unit:
 	$(MOCHA) $(shell find test/unit -name "*-test.js") $(FLAGS)
 
-integration:
-	$(MOCHA) $(shell find test/integration -name "*-test.js") $(FLAGS)
+http:
+	$(MOCHA) $(shell find test/http -name "*-test.js") $(FLAGS)
 
-acceptance:
-	$(MOCHA) $(shell find test/acceptance -name "*-test.js") $(FLAGS)
-
-chrome:
-	$(MOCHA) $(shell find adapter/chrome -name "*-test.js") $(FLAGS)
+protobuf:
+	$(MOCHA) $(shell find test/protobuf -name "*-test.js") $(FLAGS)
 
 .PHONY: test
+.PHONY: http
+.PHONY: protobuf
+

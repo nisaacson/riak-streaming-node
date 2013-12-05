@@ -5,25 +5,22 @@ var q = require('q')
 var moment = require('moment')
 
 var time = moment()
-var help = require('./test-helper')
+var help = require('../test-helper')
 
-var Client = help.require('./')
-var client = new Client({})
+var client = help.client()
 var indexKey = 'value_stream_index'
 var bucket = 'value_stream_test'
 var integerIndexBucket = 'value_stream_integer_test'
 var rowKeys = []
 
-var numRows = 200
+var numRows = 10
 
-describe('queryRangeStream', function() {
+describe('protobuf queryRangeStream', function() {
 
   this.timeout('10s')
   this.slow('5s')
 
-  before(function(done) {
-    setupFixtures(done)
-  })
+  before(setupFixtures)
 
   after(function(done) {
     removeRows(rowKeys, done)
@@ -142,9 +139,15 @@ function setupFixtures(cb) {
 }
 
 function cleanBuckets() {
-  var promise = client.bucketDeleteAll(bucket)
+  var opts = {
+    bucket: bucket
+  }
+  var promise = client.bucketDeleteAll(opts)
   promise.then(function() {
-    return client.bucketDeleteAll(integerIndexBucket)
+    var opts = {
+      bucket: integerIndexBucket
+    }
+    return client.bucketDeleteAll(opts)
   })
   return promise
 }

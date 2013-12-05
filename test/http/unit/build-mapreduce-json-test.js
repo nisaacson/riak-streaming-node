@@ -1,12 +1,11 @@
 var expect = require('chai').expect
-var help = require('./test-helper')
+var help = require('../test-helper')
 
-var buildMapReduceJSON = help.require('./lib/build-map-reduce-json')
+var buildMapReduceJSON = help.require('./http/build-map-reduce-json')
 
-describe('Build Mapreduce json', function() {
+describe('http Build Mapreduce json', function() {
 
   it('should build json with map and reduce phases', function() {
-    var mapReduceOpts = []
     var mapPhaseOpts = {
       map: {
         fn: testFunction,
@@ -21,7 +20,7 @@ describe('Build Mapreduce json', function() {
         arg: 'foo'
       }
     }
-    mapReduceOpts = [mapPhaseOpts, reducePhaseOpts]
+    var query = [mapPhaseOpts, reducePhaseOpts]
     var opts = {}
     var inputs = {
       bucket: 'test_bucket',
@@ -29,16 +28,16 @@ describe('Build Mapreduce json', function() {
       start: 'test_start',
       end: 'test_end'
     }
-    opts.mapReduceOpts = mapReduceOpts
+    opts.query = query
     opts.inputs = inputs
     var json = buildMapReduceJSON(opts)
-    validateJSON(json, mapReduceOpts, inputs)
+    validateJSON(json, query, inputs)
   })
 })
 
 
-function validateJSON(json, mapReduceOpts, inputs) {
-  expect(json).to.exist
+function validateJSON(json, sourceQuery, inputs) {
+  expect(json, 'no json object returned').to.exist
   expect(json).to.be.an('object')
   expect(json).to.have.ownProperty('inputs')
   expect(json.inputs).to.eql(inputs)
@@ -46,7 +45,7 @@ function validateJSON(json, mapReduceOpts, inputs) {
   expect(json).to.have.ownProperty('query')
   var query = json.query
   expect(query).to.be.an('array')
-  expect(query.length).to.equal(mapReduceOpts.length)
+  expect(query.length, 'wrong query array length').to.equal(sourceQuery.length)
 }
 
 function testFunction(list) {

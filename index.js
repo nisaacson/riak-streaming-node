@@ -1,39 +1,29 @@
-var defaults = require('./lib/defaults')
+var getValue = require('./lib/get-default-value')
+var getPort = require('./lib/get-default-port')
+var ProtoBufClient = require('./protobuf/client')
 
-function Client(opts) {
+var HttpClient = require('./http/client')
+
+function ClientBuilder(opts) {
+  opts = getOpts(opts)
+  if (opts.protocol === 'protobuf') {
+    return new ProtoBufClient(opts)
+  }
+
+  if (opts.protocol === 'http' || opts.protocol === 'https') {
+    return new HttpClient(opts)
+  }
+  throw new Error('invalid protocol, protocol must be one of: [http, https, protobuff]')
+}
+
+function getOpts(opts) {
   opts = opts || {}
-  this.hostname = getValue(opts, 'host')
-  this.port = getValue(opts, 'port')
-  this.protocol = getValue(opts, 'protocol')
-  this.baseURL = getBaseURL(opts)
+  opts.protocol = getValue(opts, 'protocol')
+  opts.host = getValue(opts, 'host')
+  opts.port = getPort(opts)
+  return opts
 }
 
-function getValue(opts, key) {
-  return opts[key] || defaults[key]
-}
-
-function getBaseURL(opts) {
-  var protocol = opts.protocol || defaults.protocol
-  var host = opts.host || defaults.host
-  var port = opts.port || defaults.port
-  var baseURL = protocol + '://' + host + ':' + port
-  return baseURL
-}
-
-Client.prototype.purgeDB = require('./lib/purge-db')
-Client.prototype.bucketKeys = require('./lib/bucket-keys')
-Client.prototype.bucketKeysStream = require('./lib/bucket-keys-stream')
-Client.prototype.bucketStream = require('./lib/bucket-stream')
-Client.prototype.bucketDeleteAll = require('./lib/bucket-delete-all')
-Client.prototype.getWithKey = require('./lib/get-with-key')
-Client.prototype.saveWithKey = require('./lib/save-with-key')
-Client.prototype.deleteWithKey = require('./lib/delete-with-key')
-Client.prototype.keyStreamWithQueryRange = require('./lib/key-stream-with-query-range')
-Client.prototype.valueStreamWithQueryRange = require('./lib/value-stream-with-query-range')
-Client.prototype.mapReduceStream = require('./lib/map-reduce-stream')
-Client.prototype.queryRangeStream = require('./lib/query-range-stream')
-
-
-module.exports = Client
+module.exports = ClientBuilder
 
 

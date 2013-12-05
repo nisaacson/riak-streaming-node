@@ -1,12 +1,12 @@
 var q = require('q')
 var expect = require('chai').expect
-var help = require('./test-helper')
+var help = require('../test-helper')
 var sinon = require('sinon')
-var Client = help.require('./')
-var client = new Client()
+var client = help.client()
+
 var bucketNames = ['bucket_1', 'bucket_2', 'bucket_3']
 
-describe('purgeDB', function() {
+describe('protobuf purgeDB', function() {
   before(setupFixtures)
 
   it('should remove all keys in all buckets', function(done) {
@@ -15,9 +15,11 @@ describe('purgeDB', function() {
     var promise = client.purgeDB()
     var numBucketsExpected = 0
     promise.then(function() {
-      return validateBuckets(numBucketsExpected, done)
+      return validateBuckets(numBucketsExpected)
     })
-    promise.fail(help.failHandler).done()
+    .then(function() {
+      done()
+    }).fail(help.failHandler).done()
   })
 })
 
@@ -53,7 +55,7 @@ function validateBuckets(numBucketsExpected, cb) {
 
 function getNumBuckets() {
   var deferred = q.defer()
-  var bucketStream = client.bucketStream()
+  var bucketStream = client.bucketsStream()
   var bucketNameStub = sinon.stub()
   bucketStream.on('data', bucketNameStub)
   bucketStream.on('end', function() {

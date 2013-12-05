@@ -19,7 +19,6 @@ Basic riak client that is fully streaming
     - [getWithKey](#getwithkey)
     - [saveWithKey](#savewithkey)
     - [deleteWithKey](#deletewithkey)
-    - [keyStreamWithQueryRange](#keystreamwithqueryrange)
     - [valueStreamWithQueryRange](#valuestreamwithqueryrange)
     - [queryRangeStream](#queryrangestream)
     - [mapReduceStream](#mapreducestream)
@@ -34,16 +33,49 @@ npm install -S riaks
 
 # Usage
 
+The client supports both the riak `http` interface as well as `protocol buffers`. Specify the interface you wish to use via the `protocol` parameter in the configuration option.  The api of the resulting client object is the same regardless of which protocol is used.
+
+
+* http Client
+
 ```javascript
-var Client = require('riak-streaming')
+var Client = require('riaks')
 var opts = {
   host: 'localhost',
   protocol: 'http',
-  port: '8098'
+  port: 8098
 }
 
 var client = new Client(opts)
 ```
+
+
+* protocol buffer client. Use the `protocol: 'protobuf` setting.
+
+```javascript
+var Client = require('riaks')
+var opts = {
+  host: 'localhost',
+  protocol: 'protobuf',
+  port: 8087
+}
+
+var client = new Client(opts)
+```
+
+* https Client. If you want all traffic to be encrypted over https, use the `protocol: 'https'` setting
+
+```javascript
+var Client = require('riaks')
+var opts = {
+  host: 'localhost',
+  protocol: 'https',
+  port: 443
+}
+
+var client = new Client(opts)
+```
+
 
 
 # API
@@ -55,7 +87,10 @@ Once you have a client object, the following api is available
 Get all keys from a bucket (returns a promise). According to Riak this should not be used in production since it is very slow
 
 ```javascript
-var promise = client.bucketKeys(bucketName)
+var opts = {
+  bucket: 'test_bucket_name' // name of the bucket to look in
+}
+var promise = client.bucketKeys(opts)
 promise.then(function(keys) {
   console.dir(keys)
 })
@@ -66,8 +101,11 @@ promise.then(function(keys) {
 Get all the keys in a bucket, but stream them back as they come back from Riak
 
 ```javascript
-var bucketKeysStream = client.bucketKeysStream(bucketName)
-bucketKeysStream.on('data', function(key) {
+var opts = {
+  bucket: 'test_bucket_name' // name of the bucket to look in
+}
+var keyStream = client.bucketKeysStream(opts)
+keyStream.on('data', function(key) {
   console.dir(key)
 })
 ```
@@ -89,7 +127,11 @@ bucketStream.on('data', function(bucketName) {
 delete all keys in a bucket (returns a promise)
 
 ```javascript
-var promise = client.bucketDeleteAll(bucketName)
+var opts = {
+  bucket: 'test_bucket', // name of bucket
+  concurrency: 5 // optional, limits max number of simultanous delete requests to riak
+}
+var promise = client.bucketDeleteAll(opts)
 promise.then(function() {
   console.dir('bucket emptied')
 })
@@ -97,7 +139,9 @@ promise.then(function() {
 
 ## getWithKey
 
-get value for key (returns a promise)
+Get value for key (returns a promise).
+
+If the object was saved with `content-type: application/json`, the client will call JSON.parse and return an actual javascript object.
 
 ```javascript
 var opts = {
@@ -111,8 +155,47 @@ promise.then(function(value) {
 })
 ```
 
+If you need both the value as well as the secondary index key value pairs, specify the `returnMeta: true` parameter.
+
+```javascript
+var opts = {
+  bucket: 'test_bucket',
+  key: 'test_key',
+  returnMeta: true // optional, return 2i indexes, headers, etc
+}
+var promise = client.getWithKey(opts)
+promise.then(function(reply) {
+  // note that reply is null if no key-value pair exists in riak
+  var value = reply.value
+  console.dir(value)
+
+  var indices = reply.indices
+  console.dir(indices)
+})
+```
+
+In the example above, the reply from getWithKey will look like
+
+```javascript
+{
+  value: { foo: 'bar'}, // actual javascript object but stored as json in riak
+  indices: [
+    {
+      key: 'first_index_bin',
+      value: 'first index value here'
+    },
+    {
+      key: 'second_index_bin',
+      value: 'second index value here'
+    }
+  ]
+}
+```
+
 ## saveWithKey
 save value for key with optionaly secondary indices(returns a promise). In the following example, we set two different secondary indices `test_index_one` with value `45` and `test_index_two` with value `foo`
+
+* String value
 
 ```javascript
 var opts = {
@@ -124,6 +207,26 @@ var opts = {
   },
   returnBody: true, // (optional) whether to return the contents of the stored object. defaults to false
   value: 'test_value_here'
+}
+var promise = client.saveWithKey(opts)
+promise.then(function() {
+  // if key is not found value will be undefined
+  console.dir('key saved')
+})
+```
+
+* Object value. `JSON.stringify` will be called on the value before it is saved to riak and the header `content-type: application/json` header will be applied. When you get this value back from riak via the `client.getWithKey` method, `JSON.parse` will be called so you receive an actual object back.
+
+```javascript
+var opts = {
+  bucket: 'test_bucket',
+  key: 'test_key',
+  indices: {
+    test_index_one: '45'
+    test_index_two: 'foo'
+  },
+  returnBody: true, // (optional) whether to return the contents of the stored object. defaults to false
+  value: { foo: 'bar' }
 }
 var promise = client.saveWithKey(opts)
 promise.then(function() {
@@ -145,54 +248,6 @@ var promise = client.deleteWithKey(opts)
 promise.then(function() {
   // if key is not found value will be undefined
   console.dir('key deleted')
-})
-```
-
-## keyStreamWithQueryRange
-
-Get all keys that match a given secondary index query, where the keys are streamed one at a time as they come back from Riak. The appriate secondary index key suffix of `_bin` or `_int` will be appended as appropriate based on the type of value passed in the `start` field.
-
-```javascript
-var opts = {
-  bucket: 'test_bucket',
-  indexKey: 'test_index_key',
-  start: '/x00'
-  end: '/xff'
-}
-var keyQueryStream = client.keyStreamWithQueryRange(bucketName)
-keyQueryStream.on('data', function(key) {
-  console.dir(key)
-})
-```
-
-## valueStreamWithQueryRange
-Get all values that match a given secondary index query, where the values are streamed one at a time as they come back from Riak. The values are returned in sorted order based on the index key used. The appriate secondary index key suffix of `_bin` or `_int` will be appended as appropriate based on the type of value passed in the `start` field.
-
-Using a binary index. Note the `start: '\x00'` value where `typeof '\xoo' !== 'number'`.
-```javascript
-var opts = {
-  bucket: 'test_bucket',
-  indexKey: 'test_index_binary_key',
-  start: '/x00'
-  end: '/xff'
-}
-var valueQueryStream = client.valueStreamWithQueryRange(bucketName)
-valueQueryStream.on('data', function(value) {
-  console.dir(value)
-})
-```
-
-Using a integer index. Note the `start: 0` value where `typeof 0 === 'number'`.
-```javascript
-var opts = {
-  bucket: 'test_bucket',
-  indexKey: 'test_index_integer_key',
-  start: 0,
-  end: 100
-}
-var valueQueryStream = client.valueStreamWithQueryRange(bucketName)
-valueQueryStream.on('data', function(value) {
-  console.dir(value)
 })
 ```
 
@@ -245,7 +300,7 @@ keyStream.on('data', function(data) {
 
 ## mapReduceStream
 
-Run mapreduce jobs with arbitrary javascript functions and stream back the results
+Run mapreduce jobs with arbitrary javascript functions and stream back the results. In the example below, the actual javascript functions for the map and reduce phase as passed in as paramters. The client will handle stringifying these functions before sending the `mapred` request to riak.
 
 ```javascript
 var opts = getMapReduceOpts()
@@ -277,15 +332,17 @@ function getMapReduceOpts() {
       arg: 'foo'
     }
   }
-  var mapReduceOpts = [mapPhaseOpts, reducePhaseOpts]
   var opts = {}
+  var query = [mapPhaseOpts, reducePhaseOpts]
+
+  // use a secondary index query as an input to the map reduce job
   var inputs = {
     bucket: 'test_bucket',
     index: 'test_index_key_bin',
     start: 'test_start',
     end: 'test_end'
   }
-  opts.mapReduceOpts = mapReduceOpts,
+  opts.query = query
   opts.inputs = inputs
   opts.timeout = 1000 // optional, set to 1000 milliseconds timeout or 1 second
   return opts

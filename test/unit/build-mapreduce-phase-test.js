@@ -1,5 +1,5 @@
 var expect = require('chai').expect
-var help = require('./test-helper')
+var help = require('../test-helper')
 
 var buildMapReducePhase = help.require('./lib/build-mapreduce-phase')
 

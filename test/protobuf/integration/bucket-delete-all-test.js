@@ -1,15 +1,10 @@
 var expect = require('chai').expect
 var q = require('q')
-var _ = require('lodash-node')
-var help = require('./test-helper')
-var Client = help.require('./')
-var client = new Client()
-var bucket = 'test_delete_all_bucket2'
+var help = require('../test-helper')
+var bucket, client, keys
 
-var numRows = 2
-var keys = []
-describe('bucketDeleteAll', function() {
-  before(saveTestKeys)
+describe('protobuf bucketDeleteAll', function() {
+  before(setupFixtures)
 
   after(function(done) {
     this.timeout('8s')
@@ -27,21 +22,7 @@ describe('bucketDeleteAll', function() {
   })
 })
 
-function saveTestKeys(cb) {
-  var startID = 20
-  var endID = startID + numRows
-  var range = _.range(startID, endID)
-  range.forEach(function(key) {
-    keys.push(key)
-  })
-  var promise = q.all(range.map(deleteKey))
-  promise.then(validateBucketKeys(0))
-  .then(function() {
-    return q.all(range.map(saveKey))
-  })
-  .then(validateBucketKeys(range.length))
-  .nodeify(cb)
-}
+
 
 function validateBucketKeys(numKeysExpected) {
   return function() {
@@ -65,13 +46,11 @@ function deleteKey(key) {
   })
 }
 
-function saveKey(id) {
-  var key = id.toString()
-  var saveOpts = {
-    key: key,
-    value: id,
-    bucket: bucket,
-    returnValue: true
-  }
-  return client.saveWithKey(saveOpts)
+function setupFixtures(cb) {
+  var promise = help.saveTestData()
+  promise.then(function(reply) {
+    client = reply.client
+    bucket = reply.bucket
+    keys = reply.keys
+  }).nodeify(cb)
 }

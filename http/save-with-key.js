@@ -1,6 +1,7 @@
 var q = require('q')
-var getIndexKey = require('./get-index-key')
+var getIndexKey = require('../lib/get-index-key')
 var request = require('request')
+var indicesFromHeaders = require('./indices-from-headers')
 var validateResponse = require('./validate-response')
 var validStatusCodes = [200, 201, 204]
 
@@ -10,7 +11,19 @@ module.exports = function saveWithKey(opts) {
   var requestOpts = getRequestOpts(opts)
   var cb = validateResponse(deferred, validStatusCodes, 'Save with key')
   request(requestOpts, cb)
-  return deferred.promise
+  return deferred.promise.then(function(reply) {
+    if (!reply) {
+      return undefined
+    }
+    if (!opts.returnBody) {
+      return undefined
+    }
+    if (!opts.returnMeta) {
+      return reply.value
+    }
+    reply.indices = indicesFromHeaders(reply.headers)
+    return reply
+  })
 }
 
 function getRequestOpts(opts) {

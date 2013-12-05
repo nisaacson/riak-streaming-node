@@ -1,9 +1,9 @@
 var request = require('request')
 var JSONStream = require('JSONStream')
 
-module.exports = function getKeysInBucket(bucket) {
+module.exports = function getKeysInBucket(opts) {
   var baseURL = this.baseURL
-  var url = baseURL + '/buckets/' + bucket + '/keys?keys=stream'
+  var url = baseURL + '/buckets/' + opts.bucket + '/keys?keys=stream'
   var requestOpts = {
     url: url,
     json: true

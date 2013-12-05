@@ -1,5 +1,7 @@
+var inspect = require('eyespect').inspector()
 var q = require('q')
 var validateResponse = require('./validate-response')
+var indicesFromHeaders = require('./indices-from-headers')
 var request = require('request')
 
 var validStatusCodes = [200, 404]
@@ -7,7 +9,7 @@ var validStatusCodes = [200, 404]
 module.exports = function getWithKey(opts) {
   opts.baseURL = this.baseURL
   var promise = fetch(opts)
-  return promise.then(parseResponse)
+  return promise.then(parseResponse(opts))
 }
 
 function fetch(opts) {
@@ -23,14 +25,25 @@ function fetch(opts) {
     validateResponse(deferred, validStatusCodes, 'get with key')(err, res, body)
   }
 }
-function parseResponse(body) {
-  if (!body) {
-    return q()
+
+function parseResponse(opts) {
+  return function (reply) {
+    if (!reply) {
+      return q()
+    }
+    return q.fcall(function() {
+      var data = reply.value
+      try {
+        data = JSON.parse(data)
+      } catch(err) {}
+      if (!opts.returnMeta) {
+        return data
+      }
+      reply.value = data
+      reply.indices = indicesFromHeaders(reply.headers)
+      return reply
+    })
   }
-  return q.fcall(function() {
-    var data = JSON.parse(body)
-    return data
-  })
 }
 function getRequestOpts(opts) {
   var requestOpts = {

@@ -16,7 +16,11 @@ module.exports = function (deferred, validStatusCodes, msg) {
     if (error) {
       return deferred.reject(error)
     }
-    return deferred.resolve(body)
+    var output = {
+      value: body,
+      headers: res.headers
+    }
+    return deferred.resolve(output)
   }
 }
 

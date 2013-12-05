@@ -5,7 +5,7 @@ var q = require('q')
 var moment = require('moment')
 
 var time = moment()
-var help = require('./test-helper')
+var help = require('../test-helper')
 
 var Client = help.require('./')
 var client = new Client({})
@@ -14,9 +14,9 @@ var bucket = 'value_stream_test'
 var integerIndexBucket = 'value_stream_integer_test'
 var rowKeys = []
 
-var numRows = 200
+var numRows = 10
 
-describe('valueStreamWithQueryRange', function() {
+describe('http queryRangeStream', function() {
 
   this.timeout('10s')
   this.slow('5s')
@@ -29,18 +29,40 @@ describe('valueStreamWithQueryRange', function() {
     removeRows(rowKeys, done)
   })
 
-  it('should get value stream in order', function(done) {
+  it('should get keys for binary query range in order when returnTerms = false', function(done) {
     var queryOpts = {
       bucket: bucket,
       start: '!',
       end: '~',
-      indexKey: indexKey
+      indexKey: indexKey,
+      returnTerms: false
     }
-    var valueStream = client.valueStreamWithQueryRange(queryOpts)
-    validateStream(valueStream, done)
+    var validateOpts = {
+      queryOpts: queryOpts,
+      resultType: 'string',
+      numRowsExpected: numRows
+    }
+
+    validateStream(validateOpts, done)
   })
 
-  it('should get value stream in order with integer secondary index type', function(done) {
+  it('should get keys and secondary index values for binary query range in order when returnTerms = true', function(done) {
+    var queryOpts = {
+      bucket: bucket,
+      start: '!',
+      end: '~',
+      indexKey: indexKey,
+      returnTerms: true
+    }
+    var validateOpts = {
+      queryOpts: queryOpts,
+      resultType: 'object',
+      numRowsExpected: numRows
+    }
+    validateStream(validateOpts, done)
+  })
+
+  it('should get keys for integer query range in order', function(done) {
     setupIntegerRows()
     .then(function() {
       var queryOpts = {
@@ -49,33 +71,50 @@ describe('valueStreamWithQueryRange', function() {
         end: 1000,
         indexKey: indexKey
       }
-      var valueStream = client.valueStreamWithQueryRange(queryOpts)
-      validateStream(valueStream, done)
+      var validateOpts = {
+        queryOpts: queryOpts,
+        resultType: 'string',
+        numRowsExpected: numRows
+      }
+      validateStream(validateOpts, done)
     })
   })
+
+  it('should get keys and limit by maxResults', function(done) {
+    setupIntegerRows()
+    .then(function() {
+      var maxResults = 10
+      var queryOpts = {
+        bucket: integerIndexBucket,
+        start: 0,
+        end: 1000,
+        indexKey: indexKey,
+        maxResults: maxResults
+      }
+      var validateOpts = {
+        queryOpts: queryOpts,
+        resultType: 'string',
+        numRowsExpected: maxResults
+      }
+      validateStream(validateOpts, done)
+    })
+  })
+
 })
 
-function validateStream(valueStream, cb) {
-  var prevID
+function validateStream(opts, cb) {
+  var stream = client.queryRangeStream(opts.queryOpts)
+  var resultType = opts.resultType
   var dataSpy = sinon.spy(validateDataEvent)
-  valueStream.on('data', dataSpy)
-  valueStream.on('end', function() {
-    expect(dataSpy.callCount).to.equal(numRows)
+  stream.on('data', dataSpy)
+  stream.on('end', function() {
+    expect(dataSpy.callCount).to.equal(opts.numRowsExpected)
     cb()
   })
-  valueStream.on('error', cb)
+  stream.on('error', cb)
 
-  function validateDataEvent(value) {
-    expect(value).to.be.an('object')
-    expect(value).to.have.ownProperty('id')
-    expect(value).to.have.ownProperty('timestamp')
-    var id = value.id
-    if (!prevID) {
-      prevID = id
-      return
-    }
-    expect(id).to.be.above(prevID)
-    prevID = id
+  function validateDataEvent(data) {
+    expect(data).to.be.a(resultType)
   }
 }
 
