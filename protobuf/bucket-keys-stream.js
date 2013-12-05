@@ -5,21 +5,17 @@ module.exports = function bucketKeysStream(opts) {
   var params = { bucket: opts.bucket }
   var streaming = true
   var keyStream = client.getKeys(params, streaming)
-  var extractor = extractKeys()
-  keyStream.pipe(extractor)
-  keyStream.on('error', function(err) {
-    extractor.emit('error', err)
-  })
+  var extractor = extractKeys(keyStream)
 
   return extractor
 }
 
-function extractKeys() {
-  var stringify = new stream.Transform({
+function extractKeys(keyStream) {
+  var extractor = new stream.Transform({
     objectMode: true
   })
 
-  stringify._transform = function(chunk, encoding, done) {
+  extractor._transform = function(chunk, encoding, done) {
     var keys = chunk.keys
     var self = this
     keys.forEach(function(key) {
@@ -27,6 +23,10 @@ function extractKeys() {
     })
     done()
   }
-  return stringify
+  keyStream.pipe(extractor)
+  keyStream.on('error', function(err) {
+    extractor.emit('error', err)
+  })
+  return extractor
 }
 

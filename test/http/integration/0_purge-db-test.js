@@ -6,10 +6,10 @@ var Client = help.require('./')
 var client = new Client()
 var bucketNames = ['bucket_1', 'bucket_2', 'bucket_3']
 
-describe('http purgeDB', function() {
+describe.skip('http purgeDB', function() {
   before(setupFixtures)
 
-  it('should remove all keys in all buckets', function(done) {
+  it('should remove all keys in all buckets (this is very slow so normally skipped)', function(done) {
     this.timeout('2m')
     this.slow('10s')
     var promise = client.purgeDB()
