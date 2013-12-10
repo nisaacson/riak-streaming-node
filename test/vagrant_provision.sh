@@ -46,7 +46,7 @@ function install_riak {
   command -v riak > /dev/null
   if [[ $? -eq 0 ]]; then
     echo "       riak already installed"
-    return
+     return
   fi
   echo "       riak not installed, begin installation from ppa now"
   curl http://apt.basho.com/gpg/basho.apt.key | sudo apt-key add -
@@ -62,6 +62,8 @@ function install_riak {
   # switch to leveldb as the riak backend
   echo "change riak backend to leveldb to support secondary indices"
   cd /etc/riak &&  sudo sed -i.bak -e s/riak_kv_bitcask_backend/riak_kv_eleveldb_backend/g app.config
+  cd /etc/riak &&  sudo sed -i.bak -e 0,/"enabled, false"/{s/"enabled, false"/"enabled, true"/} app.config
+  ulimit -n 4096
   sudo riak start
   if [[ $? -ne 0 ]]; then
     echo "      riak failed to start correctly"

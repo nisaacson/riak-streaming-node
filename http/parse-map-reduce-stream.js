@@ -1,10 +1,14 @@
-var stream = require('stream')
+var util = require('util')
+var Transform = require('stream').Transform
 var JSONStream = require('JSONStream')
 
-module.exports = function() {
+module.exports = function(readStream) {
   var jsonParser = JSONStream.parse(['data', true])
-  var stringify = stringifyStream()
-  stringify.pipe(jsonParser)
+  var stringify = new Stringify()
+  readStream.pipe(stringify).pipe(jsonParser)
+  readStream.on('error', function(err) {
+    stringify.emit('error', err)
+  })
   stringify.on('error', function(err) {
     jsonParser.emit('error', err)
   })
@@ -12,14 +16,15 @@ module.exports = function() {
   return jsonParser
 }
 
-function stringifyStream() {
-  var stringify = new stream.Transform({
-    objectMode: true
-  })
-  stringify._transform = function(chunk, encoding, done) {
-    var data = chunk.toString('utf8')
-    this.push(data)
-    done()
-  }
-  return stringify
+function Stringify() {
+  var opts = {}
+  Transform.call(this, opts)
+}
+
+util.inherits(Stringify, Transform)
+
+Stringify.prototype._transform = function(chunk, encoding, done) {
+  var data = chunk.toString()
+  this.push(data)
+  done()
 }

@@ -1,4 +1,5 @@
-var through = require('through')
+var util = require('util')
+var Transform = require('stream').Transform
 var getIndexKey = require('../lib/get-index-key')
 
 module.exports = function(opts) {
@@ -14,25 +15,35 @@ module.exports = function(opts) {
   if (opts.hasOwnProperty('maxResults')) {
     query.max_results = opts.maxResults
   }
-  var ts = through()
-  client.getIndex(query, cb)
-  return ts
+  var streaming = true
+  var readStream = client.getIndex(query, streaming)
+  var parser = new Parser(opts)
+  readStream.pipe(parser)
+  readStream.on('error', function(err) {
+    parser.emit('error', err)
+  })
+  return parser
+}
 
-  function cb(err, reply) {
-    var results
-    if (err) {
-      ts.emit('error', err)
-    }
-    if (!opts.returnTerms) {
-      results = reply.keys
-    }
-    else {
-      results = reply.results
-    }
-    results.forEach(function(row) {
-      ts.write(row)
-    })
-    ts.end()
+function Parser(opts) {
+  this.returnTerms = opts.returnTerms
+  var streamOpts = {
+    objectMode: true
   }
+  Transform.call(this, streamOpts)
+}
+
+util.inherits(Parser, Transform)
+
+Parser.prototype._transform = function(chunk, encoding, done) {
+  var elements
+  if (this.returnTerms) {
+    elements = chunk.results
+  } else {
+    elements = chunk.keys
+  }
+  var boundPush = this.push.bind(this)
+  elements.forEach(boundPush)
+  done()
 }
 

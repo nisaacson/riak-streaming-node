@@ -20,7 +20,7 @@
     "through": "~2.3.4",
     "errs": "~0.2.4",
     "async": "~0.2.9",
-    "riakpbc": "~1.0.4"
+    "riakpbc": "~1.0.6"
   },
   "devDependencies": {
     "chai": "~1.8.1",

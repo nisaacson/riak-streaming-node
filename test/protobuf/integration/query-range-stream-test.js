@@ -13,14 +13,16 @@ var bucket = 'value_stream_test'
 var integerIndexBucket = 'value_stream_integer_test'
 var rowKeys = []
 
-var numRows = 10
+var numRows = 11
 
 describe('protobuf queryRangeStream', function() {
 
-  this.timeout('10s')
-  this.slow('5s')
+  this.slow('1s')
 
-  before(setupFixtures)
+  before(function(done) {
+    this.timeout('4s')
+    setupFixtures(done)
+  })
 
   after(function(done) {
     removeRows(rowKeys, done)
@@ -153,7 +155,7 @@ function cleanBuckets() {
 }
 
 function setupIntegerRows() {
-  var startID = 600
+  var startID = 0
   var endID = startID + numRows
   var rows = _.range(startID, endID).map(createRow)
   var promises = rows.map(saveIntegerRow)
@@ -168,7 +170,7 @@ function saveRow(row) {
     value: row,
     indices: {}
   }
-  saveOpts.indices[indexKey] = row.id.toString()
+  saveOpts.indices[indexKey] = row.id.toString() + '_value'
   return client.saveWithKey(saveOpts)
   .then(function() {
     rowKeys.push(key)

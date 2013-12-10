@@ -1,4 +1,3 @@
-var inspect = require('eyespect').inspector()
 var q = require('q')
 var validateResponse = require('./validate-response')
 var indicesFromHeaders = require('./indices-from-headers')

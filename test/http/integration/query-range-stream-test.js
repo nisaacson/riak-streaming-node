@@ -14,7 +14,7 @@ var bucket = 'value_stream_test'
 var integerIndexBucket = 'value_stream_integer_test'
 var rowKeys = []
 
-var numRows = 10
+var numRows = 11
 
 describe('http queryRangeStream', function() {
 
@@ -150,7 +150,7 @@ function cleanBuckets() {
 }
 
 function setupIntegerRows() {
-  var startID = 600
+  var startID = 0
   var endID = startID + numRows
   var rows = _.range(startID, endID).map(createRow)
   var promises = rows.map(saveIntegerRow)
