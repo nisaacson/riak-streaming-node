@@ -13,6 +13,7 @@ function getBaseURL() {
   return baseURL
 }
 
+Client.prototype.connect = require('./connect')
 Client.prototype.bucketKeys = require('./bucket-keys')
 Client.prototype.bucketKeysStream = require('./bucket-keys-stream')
 Client.prototype.buckets = require('./buckets')

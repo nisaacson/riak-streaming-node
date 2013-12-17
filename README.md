@@ -43,7 +43,8 @@ var Client = require('riaks')
 var opts = {
   host: 'localhost',
   protocol: 'http',
-  port: 8098
+  port: 8098,
+  timeout: 10000 // optional
 }
 
 var client = new Client(opts)
@@ -57,7 +58,8 @@ var Client = require('riaks')
 var opts = {
   host: 'localhost',
   protocol: 'protobuf',
-  port: 8087
+  port: 8087,
+  timeout: 10000 // optional
 }
 
 var client = new Client(opts)
@@ -70,13 +72,29 @@ var Client = require('riaks')
 var opts = {
   host: 'localhost',
   protocol: 'https',
-  port: 443
+  port: 443,
+  timeout: 10000 // optional
 }
 
 var client = new Client(opts)
 ```
 
+Aftter the client is created, you can verify the connection to the riak server is valid by calling the `connect` method on the client. This returns a promise which is resolved after the client succesfully communicates with the riak server and gets a response back.
 
+```javascript
+var promise = client.connect()
+promise.then(connectHandler).fail(failHandler)
+
+function connectHandler() {
+  console.log('client connected correctly')
+}
+
+function failHandler(err) {
+  console.error('connection failed')
+  console.error(err)
+  throw err
+}
+```
 
 # API
 

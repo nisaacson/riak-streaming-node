@@ -6,6 +6,8 @@ describe('protobuf buckets', function() {
   before(setupFixtures)
 
   it('should get all buckets (not for production)', function(done) {
+    this.slow('2s')
+    this.timeout('4s')
     var promise = client.buckets()
     promise.then(endHandler).fail(help.failHandler).done()
 
