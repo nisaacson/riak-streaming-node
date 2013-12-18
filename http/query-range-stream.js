@@ -2,6 +2,7 @@ var parseChunkedStream = require('./parse-chunked-stream')
 var request = require('request')
 var JSONStream = require('JSONStream')
 var getIndexKey = require('../lib/get-index-key')
+var transformToKeyValueObjects = require('./transform-query-range-stream-to-key-value-pairs')
 
 module.exports = function(opts) {
   opts.baseURL = this.baseURL
@@ -10,12 +11,19 @@ module.exports = function(opts) {
   var parsedStream = parseChunkedStream(readableStream)
   var resultsKey = jsonResultsKey(opts)
   var keysParser = JSONStream.parse([resultsKey, true])
-  parsedStream.pipe(keysParser)
   parsedStream.on('error', function(err) {
     keysParser.emit('error', err)
   })
-
-  return keysParser
+  parsedStream.pipe(keysParser)
+  if (!opts.returnTerms) {
+    return keysParser
+  }
+  var transformer = new transformToKeyValueObjects()
+  keysParser.on('error', function(err) {
+    transformer.emit('error', err)
+  })
+  keysParser.pipe(transformer)
+  return transformer
 }
 
 function getRequestOpts(opts) {

@@ -309,12 +309,20 @@ var opts = {
 }
 var keyStream = client.queryRangeStream(opts)
 keyStream.on('data', function(data) {
-  var dataKeys = Object.keys(data)
-  var key = dataKeys[0]
-  var value = dataKeys[key]
-  inspect(key, 'got key')
-  inspect(value, 'matched secondary index value')
+  var key = data.key
+  var value = data.value
+  inspect(key, 'secondary index value')
+  inspect(value, 'key for key->value pair in riak')
 })
+```
+
+The data objects emitted by the stream in the above example look like
+
+```javascript
+{
+  key: 'secondary index value'
+  value: 'key to actual object stored in riak'
+}
 ```
 
 ## mapReduceStream

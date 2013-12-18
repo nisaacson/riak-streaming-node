@@ -114,6 +114,12 @@ function validateStream(opts, cb) {
 
   function validateDataEvent(data) {
     expect(data).to.be.a(resultType)
+    if (resultType === 'object') {
+      expect(data).to.have.ownProperty('key')
+      expect(data).to.have.ownProperty('value')
+      expect(data.key).to.not.be.empty
+      expect(data.value).to.not.be.empty
+    }
   }
 }
 
