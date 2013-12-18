@@ -6,7 +6,7 @@ var client = help.client()
 
 var bucketNames = ['bucket_1', 'bucket_2', 'bucket_3']
 
-describe('protobuf purgeDB', function() {
+describe.skip('protobuf purgeDB (normally skipped because slow)', function() {
   before(setupFixtures)
 
   it('should remove all keys in all buckets', function(done) {

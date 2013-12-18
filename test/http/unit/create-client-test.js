@@ -18,6 +18,14 @@ describe('http Create Client', function() {
     var client = new Client(opts)
     validateWithProtocol(client, opts.protocol)
   })
+
+  it('should support disconnect', function() {
+    var opts = {
+      protocol: 'https'
+    }
+    var client = new Client(opts)
+    client.disconnect()
+  })
 })
 
 function validateWithProtocol(client, protocol) {

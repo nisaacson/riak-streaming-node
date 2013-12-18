@@ -3,28 +3,25 @@ var help = require('../test-helper')
 var Client = help.require('./')
 
 describe('Create Client', function() {
-  it('should create client with only http protocol option', function() {
+  it('should create client with only protobuf protocol option', function() {
     var opts = {
-      protocol: 'http'
+      protocol: 'protobuf'
     }
     var client = new Client(opts)
     validateWithProtocol(client, opts.protocol)
   })
 
-  it('should create client with only https protocol option', function() {
+  it('should support disconnect', function() {
     var opts = {
       protocol: 'https'
     }
     var client = new Client(opts)
-    validateWithProtocol(client, opts.protocol)
+    client.disconnect()
   })
 })
 
 function validateWithProtocol(client, protocol) {
   expect(client).to.exist
-  expect(client).to.have.ownProperty('baseURL')
-  expect(client.baseURL).to.be.a('string')
-  expect(client.baseURL).to.not.be.empty
   expect(client.protocol).to.equal(protocol)
 }
 

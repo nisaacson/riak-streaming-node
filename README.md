@@ -23,6 +23,7 @@ Basic riak client that is fully streaming
     - [queryRangeStream](#queryrangestream)
     - [mapReduceStream](#mapreducestream)
     - [purgeDB](#purgedb)
+    - [disconnect](#disconnect)
 - [Test](#test)
 
 # Installation
@@ -396,6 +397,14 @@ var promise = client.purgeDB()
 promise.then(function() {
   console.log('All Riak buckets completely cleared')
 })
+```
+
+## disconnect
+
+Close existing open connects to riak server. This is really only needed for the `protobuf` protocol option, and is a `no-op` for the `http` protocol option to maintain a consistent public api.
+
+```javascript
+client.disconnect()
 ```
 
 # Test

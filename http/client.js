@@ -29,6 +29,9 @@ Client.prototype.bucketDeleteAll = require('../lib/bucket-delete-all')
 Client.prototype.purgeDB = require('../lib/purge-db')
 
 
+// no-op
+Client.prototype.disconnect = function() {}
+
 module.exports = Client
 
 

@@ -23,6 +23,11 @@ Client.prototype.queryRangeStream = require('./query-range-stream')
 Client.prototype.bucketDeleteAll = require('../lib/bucket-delete-all')
 Client.prototype.purgeDB = require('../lib/purge-db')
 
+// no-op
+Client.prototype.disconnect = function() {
+  this.client.disconnect()
+}
+
 module.exports = Client
 
 
