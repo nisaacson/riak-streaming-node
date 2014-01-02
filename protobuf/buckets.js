@@ -1,4 +1,5 @@
 var q = require('q')
+
 module.exports = function buckets() {
   var client = this.client
   var deferred = q.defer()

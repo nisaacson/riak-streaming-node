@@ -21,5 +21,3 @@ module.exports = function bucketKeys(opts) {
     deferred.reject(err)
   }
 }
-
-

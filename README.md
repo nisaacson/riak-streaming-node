@@ -19,6 +19,7 @@ Basic riak client that is fully streaming
     - [getWithKey](#getwithkey)
     - [saveWithKey](#savewithkey)
     - [deleteWithKey](#deletewithkey)
+    - [search](#search)
     - [valueStreamWithQueryRange](#valuestreamwithqueryrange)
     - [queryRangeStream](#queryrangestream)
     - [mapReduceStream](#mapreducestream)
@@ -268,6 +269,47 @@ promise.then(function() {
   // if key is not found value will be undefined
   console.dir('key deleted')
 })
+```
+
+## search
+
+search via the solr-compatible interface. Note that search is currently broken when using the `protobuf` protocol. See [https://github.com/nlf/riakpbc/pull/38](https://github.com/nlf/riakpbc/pull/38) for more information.
+
+[riak reference](http://docs.basho.com/riak/latest/dev/using/search/#Query-Interfaces)
+
+```javascript
+var opts = {
+  index: bucket,
+  q: 'value_*', // query
+  df: 'bar',    // default field
+  start: 0,
+  rows: 1,      // limit number of results
+  sort: 'bar',
+  filter: '',
+  presort: 'key',
+}
+var promise = client.search(opts)
+promise.then(function (reply) {
+  console.dir(reply)
+})
+```
+
+The reply object in the example above will look like
+
+```
+{
+  numFound: 4,
+  start: 0,
+  maxScore: '0.00000e+0',
+  docs: [
+    {
+      id: '1_key',
+      index: 'http_test',
+      fields: { bar: 'value_1' },
+      props: {}
+    }
+  ]
+}
 ```
 
 ## queryRangeStream

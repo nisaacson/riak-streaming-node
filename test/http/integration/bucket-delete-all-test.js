@@ -15,7 +15,10 @@ describe('http bucketDeleteAll', function() {
   it('should delete all keys in bucket (this is slow)', function(done) {
     this.timeout('8s')
     this.slow('7s')
-    var promise = client.bucketDeleteAll(bucket)
+    var opts = {
+      bucket: bucket
+    }
+    var promise = client.bucketDeleteAll(opts)
     promise.then(validateBucketKeys(0))
     .then(done)
     .done()

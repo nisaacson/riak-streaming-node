@@ -38,30 +38,25 @@ function npm_rebuild {
   su -c "cd /vagrant/ && npm rebuild" -s /bin/sh vagrant
 }
 
-function install_httpie {
-  command -v http > /dev/null
-  if [[ $? -eq 0 ]]; then
-    echo "       httpie already installed"
-    return
-  fi
-  install_from_apt "python-pip"
-  install_from_apt "python-dev"
-  sudo pip install --upgrade pip
-  sudo pip install --upgrade httpie
-}
-
 function enable_indexing_on_riak_buckets {
+  echo "-----> Enable search on riak buckets"
+  echo "       sleep for 3 seconds so riak has time to start"
   sleep "3s"
-  BUCKET="search_test"
+  BUCKET="http_test"
   URL="http://localhost:8098/riak/$BUCKET"
   DATA='{"props":{"precommit":[{"mod":"riak_search_kv_hook","fun":"precommit"}]}}'
-  echo $DATA | http PUT $URL
-  echo "enabled search on bucket: $BUCKET"
+  curl --silent -X PUT -d $DATA -H "Content-Type: application/json" $URL
+  echo "       enabled search on bucket: $BUCKET"
+
+  BUCKET="protobuf_test"
+  URL="http://localhost:8098/riak/$BUCKET"
+  DATA='{"props":{"precommit":[{"mod":"riak_search_kv_hook","fun":"precommit"}]}}'
+  curl --silent -X PUT -d $DATA -H "Content-Type: application/json" $URL
+  echo "       enabled search on bucket: $BUCKET"
 }
 
 install_from_apt "curl"
 install_from_apt "git"
 install_node
-install_httpie
 enable_indexing_on_riak_buckets
 # npm_rebuid

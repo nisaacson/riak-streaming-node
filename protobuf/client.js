@@ -9,6 +9,7 @@ function Client(opts) {
 }
 
 Client.prototype.connect = require('./connect')
+Client.prototype.search = require('./search')
 Client.prototype.bucketKeys = require('./bucket-keys')
 Client.prototype.bucketKeysStream = require('./bucket-keys-stream')
 Client.prototype.buckets = require('./buckets')

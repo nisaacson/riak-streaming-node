@@ -26,7 +26,8 @@
     "chai": "~1.8.1",
     "mocha": "~1.15.1",
     "sinon": "~1.7.3",
-    "moment": "~2.4.0"
+    "moment": "~2.4.0",
+    "cloneextend": "0.0.3"
   },
   "directories": {
     "test": "test"

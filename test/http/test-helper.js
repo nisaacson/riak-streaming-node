@@ -1,14 +1,16 @@
 var q = require('q')
 var _ = require('lodash-node')
 var expect = require('chai').expect
-var help = require('../test-helper')
+var ce = require('cloneextend')
+var help = ce.clone(require('../test-helper'))
+var bucket = 'http_test'
 var Client = help.require('./')
 
-var numRows, client
-var bucket = 'http_test'
+var numRows,
+  client
 var indexKey = 'http_index_key'
 
-help.client = function () {
+help.client = function() {
   var opts = {
     protocol: 'http'
   }
@@ -19,12 +21,8 @@ help.client = function () {
 
 help.saveTestData = function saveTestData(rowsToSave) {
   numRows = rowsToSave || 5
-  var clientOpts = {
-    protocol: 'http'
-  }
-
-  client = new Client(clientOpts)
-  var range = _.range(1,numRows)
+  client = help.client()
+  var range = _.range(1, numRows)
   var promise = q.all(range.map(saveRow))
   return promise.then(function(keys) {
     var output = {
@@ -40,7 +38,8 @@ help.saveTestData = function saveTestData(rowsToSave) {
 function saveRow(id) {
   var key = id + '_key'
   var value = {
-    bar: id + '_value'
+    bar: 'value_' + id,
+    fizz: 'buzz_' + id
   }
   var indexValue = id.toString()
   var saveOpts = {
