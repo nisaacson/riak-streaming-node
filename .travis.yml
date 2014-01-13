@@ -13,3 +13,5 @@ before_install:
 before_script:
   - sudo /usr/sbin/search-cmd install test
   - sudo /usr/sbin/search-cmd install search_test
+  - sudo /usr/sbin/search-cmd install http_test
+  - sudo /usr/sbin/search-cmd install protobuf_test
