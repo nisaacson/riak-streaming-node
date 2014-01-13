@@ -1,6 +1,7 @@
 var errs = require('errs')
 var q = require('q')
 var getIndexKey = require('../lib/get-index-key')
+var parseIndices = require('./parse-indices')
 
 module.exports = function saveWithKey(opts) {
   var self = this
@@ -104,12 +105,14 @@ function parseResponse(returnBody) {
         output.indexes = []
       }
       output.value = value
-      output.indices = output.indexes
+      output.indices = parseIndices(output.indexes)
       delete output.indexes
       return output
     })
   }
 }
+
+
 /*
  *
  *function getRequestOpts(opts) {

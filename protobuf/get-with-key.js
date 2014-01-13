@@ -1,4 +1,5 @@
 var q = require('q')
+var parseIndices = require('./parse-indices')
 
 module.exports = function getWithKey(opts) {
   var client = this.client
@@ -19,19 +20,24 @@ function parseResponse(opts) {
       if (Object.keys(body).length === 0) {
         return q()
       }
-      var value = body.content[0].value
-      var contentType = body.content[0].content_type
-      if (contentType.match(/^text/)) {
-        value = value.toString()
-      }
-      if (!opts.returnMeta) {
-        return value
-      }
-      var reply = {
-        value: value,
-        indices: body.content[0].indexes
-      }
-      return reply
+      return parseContent(body.content[0])
     })
+  }
+
+  function parseContent(content) {
+    var value = content.value
+    var contentType = content.content_type
+    if (contentType.match(/^text/)) {
+      value = value.toString()
+    }
+    if (!opts.returnMeta) {
+      return value
+    }
+    var indices = parseIndices(content.indexes)
+    var reply = {
+      value: value,
+      indices: indices
+    }
+    return reply
   }
 }

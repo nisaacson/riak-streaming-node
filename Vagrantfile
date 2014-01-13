@@ -30,7 +30,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   # shell provisioner
-  config.vm.provision "shell", path: "test/provision_vagrant.sh"
+  config.vm.provision "shell", path: "test/vagrant_provision.sh"
 
 
   ####################################

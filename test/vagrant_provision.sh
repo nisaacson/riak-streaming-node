@@ -9,14 +9,7 @@ function install_from_apt {
     return
   fi
   echo "       $TOOL not installed, begin installation from apt"
-  sudo apt-get install -qqy curl
-  command -v $TOOL > /dev/null
-  if [[ $? -eq 0 ]]; then
-    echo "       $TOOL installed correctly"
-    return
-  fi
-  echo "$TOOL failed to install correctly"
-  exit 1
+  sudo apt-get install -qqy $TOOL
 }
 
 function install_node {
@@ -41,44 +34,28 @@ function install_node {
   exit 1
 }
 
-function install_riak {
-  echo "-----> Install riak if needed"
-  command -v riak > /dev/null
-  if [[ $? -eq 0 ]]; then
-    echo "       riak already installed"
-     return
-  fi
-  echo "       riak not installed, begin installation from ppa now"
-  curl http://apt.basho.com/gpg/basho.apt.key | sudo apt-key add -
-  sudo bash -c "echo deb http://apt.basho.com $(lsb_release -sc) main > /etc/apt/sources.list.d/basho.list"
-  sudo apt-get update
-  sudo apt-get install riak
-  command -v riak > /dev/null
-  if [[ $? -ne 0 ]]; then
-    echo "       riak failed to install correctly"
-    exit 1
-  fi
+function npm_rebuild {
+  su -c "cd /vagrant/ && npm rebuild" -s /bin/sh vagrant
+}
 
-  # switch to leveldb as the riak backend
-  echo "change riak backend to leveldb to support secondary indices"
-  cd /etc/riak &&  sudo sed -i.bak -e s/riak_kv_bitcask_backend/riak_kv_eleveldb_backend/g app.config
-  cd /etc/riak &&  sudo sed -i.bak -e 0,/"enabled, false"/{s/"enabled, false"/"enabled, true"/} app.config
-  ulimit -n 4096
-  sudo riak start
-  if [[ $? -ne 0 ]]; then
-    echo "      riak failed to start correctly"
-    exit 1
-  fi
-  echo "      riak start completed"
-  sleep "5s"
-  riak ping
-  if [[ $? -ne 0 ]]; then
-    echo "       riak failed to install correctly"
-    exit 1
-  fi
-   echo "riak install correctly"
+function enable_indexing_on_riak_buckets {
+  echo "-----> Enable search on riak buckets"
+  echo "       sleep for 3 seconds so riak has time to start"
+  sleep "3s"
+  enable_search_on_single_bucket "http_test"
+  enable_search_on_single_bucket "protobuf_test"
+}
+
+function enable_search_on_single_bucket {
+  BUCKET=$1
+  URL="http://localhost:8098/riak/$BUCKET"
+  DATA='{"props":{"precommit":[{"mod":"riak_search_kv_hook","fun":"precommit"}]}}'
+  curl --silent -X PUT -d $DATA -H "Content-Type: application/json" $URL
+  echo "       enabled search on bucket: $BUCKET"
 }
 
 install_from_apt "curl"
+install_from_apt "git"
 install_node
-install_riak
+enable_indexing_on_riak_buckets
+# npm_rebuid

@@ -20,6 +20,7 @@ Basic riak client that is fully streaming
     - [saveWithKey](#savewithkey)
     - [deleteWithKey](#deletewithkey)
     - [search](#search)
+    - [searchStream](#searchStream)
     - [valueStreamWithQueryRange](#valuestreamwithqueryrange)
     - [queryRangeStream](#queryrangestream)
     - [mapReduceStream](#mapreducestream)
@@ -273,7 +274,7 @@ promise.then(function() {
 
 ## search
 
-search via the solr-compatible interface. Note that search is currently broken when using the `protobuf` protocol. See [https://github.com/nlf/riakpbc/pull/38](https://github.com/nlf/riakpbc/pull/38) for more information.
+Search via the solr-compatible interface.
 
 [riak reference](http://docs.basho.com/riak/latest/dev/using/search/#Query-Interfaces)
 
@@ -309,6 +310,44 @@ The reply object in the example above will look like
       props: {}
     }
   ]
+}
+```
+
+## searchStream
+
+Search via the solr-compatible interface and automatically search over paginated results via streaming interface
+
+[riak reference](http://docs.basho.com/riak/latest/dev/using/search/#Query-Interfaces)
+
+```javascript
+var opts = {
+  index: bucket,
+  q: 'value_*', // query
+  df: 'bar',    // default field
+  start: 0,
+  rows: 1,      // limit number of results per page, (optional, defaults to 20)
+  maxRows: 20   // end the stream when reached, if not set client will stream all matching results
+  sort: 'bar',
+  filter: '',
+  presort: 'key',
+}
+var readStream = client.searchStream(opts)
+readStream.on('data', function dataHandler(reply) {
+  console.dir(reply)
+})
+readStream.on('finish', function finishHandler() {
+  console.log('got all rows from search stream')
+})
+```
+
+The reply object in the `dataHandler` function in the example above will look like
+
+```
+{
+  id: '1_key',
+  index: 'http_test',
+  fields: { bar: 'value_1' },
+  props: {}
 }
 ```
 

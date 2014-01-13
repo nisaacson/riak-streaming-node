@@ -26,6 +26,7 @@ Client.prototype.mapReduceStream = require('./map-reduce-stream')
 Client.prototype.queryRangeStream = require('./query-range-stream')
 
 // common
+Client.prototype.searchStream = require('../lib/search-stream')
 Client.prototype.bucketDeleteAll = require('../lib/bucket-delete-all')
 Client.prototype.purgeDB = require('../lib/purge-db')
 
