@@ -17,7 +17,7 @@ Basic riak client that is fully streaming
     - [bucketStream](#bucketstream)
     - [bucketDeleteAll](#bucketdeleteall)
     - [getWithKey](#getwithkey)
-    - [saveWithKey](#savewithkey)
+    - [save](#save)
     - [deleteWithKey](#deletewithkey)
     - [search](#search)
     - [searchStream](#searchStream)
