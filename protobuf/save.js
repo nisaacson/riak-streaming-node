@@ -3,7 +3,7 @@ var q = require('q')
 var getIndexKey = require('../lib/get-index-key')
 var parseIndices = require('./parse-indices')
 
-module.exports = function saveWithKey(opts) {
+module.exports = function save(opts) {
   var self = this
   return q.fcall(function() {
     return save.call(self, opts)
@@ -19,7 +19,7 @@ function save(opts) {
   }
   catch(err) {
     var error = errs.merge(err, {
-      action: 'saveWithKey',
+      action: 'save',
       requestOpts: requestOpts
     })
     throw error
@@ -58,7 +58,6 @@ function getRequestOpts(opts) {
   var valueAndContentType = getValueAndContentType(opts)
   var requestOpts = {
     bucket: opts.bucket,
-    key: opts.key,
     content: {
       value: valueAndContentType.value,
       content_type: valueAndContentType.contentType,
@@ -66,6 +65,7 @@ function getRequestOpts(opts) {
     },
     return_body: opts.returnBody
   }
+  if (opts.key) requestOpts.key = opts.key
   return requestOpts
 }
 
@@ -74,7 +74,6 @@ function getIndices(opts) {
   var indices = Object.keys(opts.indices).map(function(indexKey) {
     var indexValue = opts.indices[indexKey]
     indexKey = getIndexKey(indexKey, indexValue)
-    // indexValue = indexValue.toString()
     var output = {
       key: indexKey,
       value: indexValue
@@ -111,52 +110,3 @@ function parseResponse(returnBody) {
     })
   }
 }
-
-
-/*
- *
- *function getRequestOpts(opts) {
- *  var requestOpts = {
- *    method: 'PUT',
- *    body: opts.value,
- *    url: getURL(opts),
- *    json: true
- *  }
- *  requestOpts.headers = getHeaders(opts)
- *  return requestOpts
- *}
- *
- *function getURL(opts) {
- *  var bucket = opts.bucket
- *  var key = opts.key
- *  var url = [opts.baseURL, 'buckets', bucket, 'keys', key].join('/')
- *  if (opts.returnBody) {
- *    url += '?returnbody=true'
- *  }
- *  else {
- *    url += '?returnbody=false'
- *  }
- *  return url
- *}
- *
- *function getHeaders(opts) {
- *  var indices = opts.indices
- *  var headers = getIndexHeaders(indices)
- *  headers['Content-Type'] = 'application/json'
- *  return headers
- *}
- *
- *function getIndexHeaders(indices) {
- *  if (!indices) {
- *    return {}
- *  }
- *  var headers = Object.keys(indices).reduce(function(a, key) {
- *    var value = indices[key]
- *    var indexKey = getIndexKey(key, value)
- *    var headerKey = 'X-Riak-Index-' + indexKey
- *    a[headerKey] = value
- *    return a
- *  }, {})
- *  return headers
- *}
- */
