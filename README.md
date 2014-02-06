@@ -17,7 +17,7 @@ Basic riak client that is fully streaming
     - [bucketStream](#bucketstream)
     - [bucketDeleteAll](#bucketdeleteall)
     - [getWithKey](#getwithkey)
-    - [saveWithKey](#savewithkey)
+    - [save](#save)
     - [deleteWithKey](#deletewithkey)
     - [search](#search)
     - [searchStream](#searchStream)
@@ -213,15 +213,19 @@ In the example above, the reply from getWithKey will look like
 }
 ```
 
-## saveWithKey
-save value for key with optionaly secondary indices(returns a promise). In the following example, we set two different secondary indices `test_index_one` with value `45` and `test_index_two` with value `foo`
+## [[save]]
+save value with optionaly secondary indices(returns a promise). In the following example, we set two different secondary indices `test_index_one` with value `45` and `test_index_two` with value `foo`
+
+If a key is included in the options, this method will select a `PUT` for
+the HTTP verb, otherwise it will use a `POST` and get a random key from
+Riak.
 
 * String value
 
 ```javascript
 var opts = {
   bucket: 'test_bucket',
-  key: 'test_key',
+  key: 'test_key', //Forces `PUT` for http communication
   indices: {
     test_index_one: '45'
     test_index_two: 'foo'
@@ -229,7 +233,7 @@ var opts = {
   returnBody: true, // (optional) whether to return the contents of the stored object. defaults to false
   value: 'test_value_here'
 }
-var promise = client.saveWithKey(opts)
+var promise = client.save(opts)
 promise.then(function() {
   // if key is not found value will be undefined
   console.dir('key saved')
@@ -249,7 +253,7 @@ var opts = {
   returnBody: true, // (optional) whether to return the contents of the stored object. defaults to false
   value: { foo: 'bar' }
 }
-var promise = client.saveWithKey(opts)
+var promise = client.save(opts)
 promise.then(function() {
   // if key is not found value will be undefined
   console.dir('key saved')

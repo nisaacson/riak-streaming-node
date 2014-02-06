@@ -5,11 +5,11 @@ var indicesFromHeaders = require('./indices-from-headers')
 var validateResponse = require('./validate-response')
 var validStatusCodes = [200, 201, 204]
 
-module.exports = function saveWithKey(opts) {
+module.exports = function save(opts) {
   var deferred = q.defer()
   opts.baseURL = this.baseURL
   var requestOpts = getRequestOpts(opts)
-  var cb = validateResponse(deferred, validStatusCodes, 'Save with key')
+  var cb = validateResponse(deferred, validStatusCodes, 'Save')
   request(requestOpts, cb)
   return deferred.promise.then(function(reply) {
     if (!reply) {
@@ -27,8 +27,9 @@ module.exports = function saveWithKey(opts) {
 }
 
 function getRequestOpts(opts) {
+  var method = opts.key ? 'PUT' : 'POST'
   var requestOpts = {
-    method: 'PUT',
+    method: method,
     body: opts.value,
     url: getURL(opts),
     json: true
